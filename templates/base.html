@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"/>
+
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    {% block slider %}
+    <div id="wrapper">
+        <span class="line"> </span>
+        <span class="line"> </span>
+        <span class="line"> </span>
+    </div>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div class="slider">
+        <ul>
+        <li id="home">Home</li>
+        <li id="tournaments">Tournaments</li>
+        <li id="rating">Rating</li>
+        </ul>
+    </div>
+    <script>
+        document.getElementById("wrapper").addEventListener("click", function(){
+            document.getElementById("wrapper").backgroundColor = "#999999";
+            Array.prototype.forEach.call(document.getElementsByClassName("line"), function(el) {
+                el.classList.toggle("grill")
+            })
+            document.getElementsByClassName("slider")[0].classList.toggle('showslide')
+        });
+        document.getElementById("home").addEventListener("click", function(){
+            if(window.location.pathname != "/"){
+                window.location ="/";
+            }
+        })
+        document.getElementById("tournaments").addEventListener("click", function(){
+            if(window.location.pathname != "/tournaments"){
+                window.location = "/tournaments";
+            }
+        })
+        document.getElementById("rating").addEventListener("click", function(){
+            if(window.location.pathname != "/rating"){
+                window.location = "/rating";
+            }
+        })
+    </script>
+    {% endblock %}
+    <footer>
+        {% block footer %}
+        <div align="center" >
+            <table style="margin-top: 20px;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 0 15px">
+                            Maintained by <a href="https://t.me/omen_rigby">Igor Bitkin</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endblock %}
+    </footer>
+</body>
+
+</html>

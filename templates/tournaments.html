@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Tournaments{% endblock %}
+{% block content %}
+<div align="center">
+    <table class="hy"><tbody>
+    <tr><th>Date</th><th>Scoring</th><th>Pairs</th><th></th></tr>
+    {% for t in tournaments %}
+    <tr class="{{'odd' if loop.index0 % 2 else 'even'}}"><td>{{t.date}}</td><td>{{t.scoring}}</td>
+        <td>{{t.players}}</td><td><a href="/result/{{t.id}}/ranks">Results</a></td></tr>
+    {% endfor %}
+    </tbody></table>
+</div>
+{% endblock %}
