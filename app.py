@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, send_from_directory
-from util import Dict2Class, connect
+from util import Dict2Class, connect, nbsp_names
 
 VULNERABILITY = ["e",
                  "-", "n", "e", "b",
@@ -57,7 +57,7 @@ def ranks(tournament_id):
     data = cursor.fetchone()
     cursor.execute(f"select * from names where tournament_id={tournament_id} order by regexp_replace(rank, '−.*', '', 'g')::int")
     totals = cursor.fetchall()
-    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": total[2], "mp": total[4],
+    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]), "mp": total[4],
                                "percent": total[5], "masterpoints": total[6] or '', "masterpoints_ru": total[7] or ''})
                    for total in totals]
     conn.close()
@@ -81,7 +81,7 @@ def scorecard(tournament_id, pair_number):
     personals = cursor.fetchall()
     max_mp = (data[2] // 2 - 1) * 2
     scoring_short = data[4].rstrip("s").replace("Cross-", "X")
-    pair = Dict2Class({"name": pair_results[1], "number": pair_number, "scoring": data[4],
+    pair = Dict2Class({"name": nbsp_names(pair_results[1]), "number": pair_number, "scoring": data[4],
                        "mp_total": pair_results[3],
                        "percent_total": pair_results[4],
                        "rank": pair_results[2], "boards": []})
@@ -93,7 +93,7 @@ def scorecard(tournament_id, pair_number):
         if not p:
             # not played
             pair.boards.append(Dict2Class({"number": i, "vul": vul[VULNERABILITY[i % 16]],
-                                               "dir": "", "contract": "NOT PLAYED",
+                                               "dir": "", "contract": "NOT&nbsp;PLAYED",
                                                "declarer": "", "lead": "",
                                                "score": '', "mp": 0,
                                                "percent": 0,
@@ -104,7 +104,7 @@ def scorecard(tournament_id, pair_number):
         position = "NS" if p[2] == pair_number else 'EW'
         index = 8 + (position == 'EW')
         opps = p[2 + (position != 'EW')]
-        opp_names = [n for n in names if n[0] == opps][0][1]
+        opp_names = nbsp_names([n for n in names if n[0] == opps][0][1])
         mp = p[index] or 0
         current_round = (i - 1) // boards_per_round
 
@@ -158,8 +158,8 @@ def board(tournament_id, board_number):
     for p in personals:
         repl_dict = {"ns": p[2], "ew": p[3], "contract": p[4], "declarer": p[5], "lead": p[6],
                      "nsplus": p[7] if p[7] > 1 else "", "nsminus": -p[7] if p[7] < 0 else "", "mp_ns": round(p[8], 2),
-                     "mp_ew": round(p[9], 2), "ns_name": [n[1] for n in names if n[0] == p[2]][0],
-                     "ew_name": [n[1] for n in names if n[0] == p[3]][0], "bbo_url": p[10]}
+                     "mp_ew": round(p[9], 2), "ns_name": nbsp_names([n[1] for n in names if n[0] == p[2]][0]),
+                     "ew_name": nbsp_names([n[1] for n in names if n[0] == p[3]][0]), "bbo_url": p[10]}
         current_board.tables.append(Dict2Class(repl_dict))
 
     conn.close()

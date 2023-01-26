@@ -23,15 +23,10 @@
     <th align="center">Master Points (RU)</th>
   </tr>
   {% for pair in totals %}
-
-  {% if loop.index0 % 2 %}
-  <tr class="odd">
-  {% else %}
-  <tr class="even">
-  {% endif %}
+  <tr>
     <td align="center">{{pair.rank}}</td>
-    <td align="center"><a href="/result/{{tournament_id}}/scorecard/{{pair.number}}">{{pair.number}}</td>
-    <td align="left">{{pair.names}}</td>
+    <td align="center"><a href="/result/{{tournament_id}}/scorecard/{{pair.number}}">{{pair.number}}</a></td>
+    <td align="left">{{pair.names|safe}}</td>
     <td align="center">{{pair.mp}}</td>
     {% if scoring == "MPs" %}
     <td align="center">{{pair.percent}}</td>

@@ -24,3 +24,8 @@ class Dict2Class(object):
     def __str__(self):
         return '{' + \
                ", ".join(f"{k}: " + ("list" if type(v) == list else v.__str__()) for k, v in self.dict.items()) + '}'
+
+
+def nbsp_names(text):
+    text = text.replace(' & ', '!').replace(' ', '&nbsp;').replace('!', ' & ')
+    return text

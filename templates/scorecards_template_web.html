@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block title %}{{pair.name}} - Scorecards{% endblock %}
 {% block content %}
-<h2>PAIR {{pair.number}} {{pair.name}}</h2>
+<div align="center" style="margin-bottom: 10px">
+    <nav>
+        <a href="/result/{{tournament_id}}/ranks" class="header-link">Ranks</a>
+    </nav>
+</div>
+<h2>PAIR {{pair.number}} {{pair.name|safe}}</h2>
 {% if scoring_short == "MP" %}
 <h2>{{scoring_short}} {{pair.mp_total}} MaxMPs {{max_mp}} Score {{pair.percent_total}}% Rank {{pair.rank}}</h2>
 {% else %}
@@ -25,11 +30,7 @@
       <th align="center">{{scoring_short}}s per round</th>
       <th align="center">Opps</th></tr>
     {% for board in pair.boards %}
-    {% if loop.index0 % 2 %}
-    <tr class="odd">
-    {% else %}
-    <tr class="even">
-    {% endif %}
+    <tr>
       <td align="center"><a href="/result/{{tournament_id}}/board/{{board.number}}">{{board.number}}</a></td>
       <td align="center">{{board.vul}}</td>
       <td align="center">{{board.dir}}</td>
@@ -43,7 +44,7 @@
       <td align="center">{{board.mp}}</td>
       {% if loop.index0 % boards_per_round == 0 %}
       <td rowspan="{{boards_per_round}}" class="round">{{board.mp_per_round}}</td>
-      <td rowspan="{{boards_per_round}}" class="round" align="left">{{board.opp_names}}</td>
+      <td rowspan="{{boards_per_round}}" class="round" align="left">{{board.opp_names|safe}}</td>
       {% endif %}
     </tr>
     {% endfor %}
