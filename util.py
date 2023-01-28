@@ -29,3 +29,8 @@ class Dict2Class(object):
 def nbsp_names(text):
     text = text.replace(' & ', '!').replace(' ', '&nbsp;').replace('!', ' & ')
     return text
+
+
+def hcp(hand):
+    h = hand.lower()
+    return 4 * h.count('a') + 3 * h.count('k') + 2 * h.count('q') + h.count('j')

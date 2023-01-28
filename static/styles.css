@@ -324,3 +324,29 @@ text-align: center
 .names {
   max-width: calc(vw * 3 / 4);
 }
+.hcp-table {
+    display: inline-block;
+    align-content: center;
+    table-layout: fixed;
+}
+
+.hcp-table td {
+width:17px;
+}
+
+
+.crossed {
+     background:
+         linear-gradient(to top left,
+             rgba(0,0,0,0) 0%,
+             rgba(0,0,0,0) calc(50% - 0.8px),
+             rgba(0,0,0,1) 50%,
+             rgba(0,0,0,0) calc(50% + 0.8px),
+             rgba(0,0,0,0) 100%),
+         linear-gradient(to top right,
+             rgba(0,0,0,0) 0%,
+             rgba(0,0,0,0) calc(50% - 0.8px),
+             rgba(0,0,0,1) 50%,
+             rgba(0,0,0,0) calc(50% + 0.8px),
+             rgba(0,0,0,0) 100%);
+}

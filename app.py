@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, send_from_directory
-from util import Dict2Class, connect, nbsp_names
+from util import Dict2Class, connect, nbsp_names, hcp
 
 VULNERABILITY = ["e",
                  "-", "n", "e", "b",
@@ -149,6 +149,10 @@ def board(tournament_id, board_number):
             repl_dict[f"{h}{s}"] = board_data[2 + i * 4 + j].upper().replace("T", "10")
         for j, d in enumerate(reversed(DENOMINATIONS)):
             repl_dict[f"{h}_par_{d}"] = board_data[18+i*5+j]
+    repl_dict['n_hcp'] = hcp(''.join(board_data[2:6]))
+    repl_dict['e_hcp'] = hcp(''.join(board_data[6:10]))
+    repl_dict['s_hcp'] = hcp(''.join(board_data[10:14]))
+    repl_dict['w_hcp'] = 40 - repl_dict['n_hcp'] - repl_dict['e_hcp'] - repl_dict['s_hcp']
     dealer_low = repl_dict["d"].lower()
     repl_dict["ns_vul"] = (repl_dict["v"] in ("EW", "−")) * "non" + "vul"
     repl_dict["ew_vul"] = (repl_dict["v"] in ("NS", "−")) * "non" + "vul"
