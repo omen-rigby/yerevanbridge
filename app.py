@@ -41,12 +41,13 @@ def tournaments():
 def rating():
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(f'select full_name,rating,rank,rank_ru  from players order by rating desc')
+    cursor.execute(f'select full_name,rating,rank,rank_ru,last_year  from players order by rating desc')
     data = cursor.fetchall()
 
     conn.close()
     return render_template('rating.html', players=[Dict2Class(
-        {'name': d[0], 'rating': d[1], 'rank': d[2], 'rank_ru': "" if d[3] == 1.6 else d[3]}) for d in data])
+        {'name': d[0], 'rating': d[1], 'rank': d[2], 'rank_ru': "" if d[3] == 1.6 else d[3],
+         'last_year': d[4] or ''}) for d in data])
 
 
 @app.route('/result/<tournament_id>/ranks')

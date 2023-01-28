@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{pair.name}} - Scorecards{% endblock %}
+{% block title %}{{pair.name|replace("&nbsp;", " ")}} - Scorecards{% endblock %}
 {% block content %}
 <div align="center" style="margin-bottom: 10px">
     <nav>

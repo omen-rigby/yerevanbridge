@@ -4,13 +4,13 @@
 <h1>Rating list</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Position</th><th>Name</th><th>Rating</th><th>Fast</th><th>Rank</th><th>Rank RU</th></tr>
+    <tr><th>Position</th><th>Name</th><th>Rating</th><th>Last year</th><th>Rank</th><th>Rank RU</th></tr>
     {% for p in players %}
     <tr>
         <td>{{loop.index}}</td>
         <td>{{p.name}}</td>
         <td>{{p.rating}}</td>
-        <td></td>
+        <td>{{p.last_year}}</td>
         <td>{{p.rank}}</td>
         <td>{{p.rank_ru}}</td>
     </tr>
