@@ -188,10 +188,19 @@ background-color: #c6d2ea
 .one-digit{
 padding: 5px 0.5rem !important;
 }
+.arrow{
+border: none !important;
+
+}
+.current-board {
+  background-color: #ccffcc !important;
+  text-decoration: underline !important;
+}
 .btn-nav{
-  background-color: #ffffff; /* Green */
+  background-color: #ffffff;
   font-family: Droid Sans Mono;
   color: #c5ffff;
+  height: 18px;
   border: solid 2px black;
   border-radius: 30%;
   color: #555555;
@@ -271,6 +280,10 @@ min-width: calc(var(--board-height)-50px);
     font-size: 13px;
     padding: 0%;
     background-color:#ffffff
+}
+
+.spacer{
+width: 50px;
 }
 
 .n {

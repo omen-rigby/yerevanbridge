@@ -32,9 +32,17 @@ def tournaments():
     cursor.execute(f'select tournament_id,date,scoring,players  from tournaments order by date desc')
     data = cursor.fetchall()
 
+    cursor.execute("""select tournament_id,"number",partnership from names where "rank"='1' or "rank" like '1−%'""")
+    winners = cursor.fetchall()
+    tournaments_list = []
+    for d in data:
+        winner = [w for w in winners if w[0] == d[0]][0]
+        tournaments_list.append(Dict2Class({
+            'id': d[0], 'date': d[1], 'scoring': d[2], 'players': d[3], 'winner_num': winner[1],
+            'winner_names': winner[2]
+        }))
     conn.close()
-    return render_template('tournaments.html', tournaments=[Dict2Class(
-        {'id': d[0], 'date': d[1], 'scoring': d[2], 'players': d[3]}) for d in data])
+    return render_template('tournaments.html', tournaments=tournaments_list)
 
 
 @app.route('/rating')
@@ -142,7 +150,7 @@ def board(tournament_id, board_number):
     scoring_short = data[4].rstrip("s").replace("Cross-", "X")
     vul = {'-': "−", "n": "NS", "e": "EW", "b": "ALL"}
 
-    repl_dict = {"d": hands[board_number % 4].upper(), "b": board_number, "v": vul[VULNERABILITY[board_number % 16]],
+    repl_dict = {"d": hands[board_number - 1 % 4].upper(), "b": board_number, "v": vul[VULNERABILITY[board_number % 16]],
                  "minimax_contract": board_data[38], "minimax_outcome": board_data[39], "minimax_url": board_data[40]}
     for i, h in enumerate(hands):
         for j, s in enumerate(SUITS):

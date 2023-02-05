@@ -92,16 +92,30 @@ text-align: center
 <div align="center" style="margin-bottom: 10px">
     <nav>
         <a href="/result/{{tournament_id}}/ranks" class="header-link">Ranks</a>
+        {% if board.b > 1 %}
+        <a href="/result/{{tournament_id}}/board/{{board.b - 1}}" class="btn-nav arrow">&#x25C4;</a>
+        {% endif %}
         {% for i in range(1, maxboard + 1) %}
+        {% if i == board.b %}
+        {% if i < 10 %}
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit current-board">{{i}}</a>
+        {% else %}
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav current-board">{{i}}</a>
+        {% endif %}
+        {% else %}
         {% if i < 10 %}
         <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit">{{i}}</a>
         {% else %}
         <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav">{{i}}</a>
         {% endif %}
+        {% endif %}
         {% endfor %}
+        {% if board.b != maxboard %}
+        <a href="/result/{{tournament_id}}/board/{{board.b + 1}}" class="btn-nav arrow">&#x25BA;</a>
+        {% endif %}
     </nav>
 </div>
-<div align="center" style="margin: 0 0 0 5%; overflow-x: scroll;">
+<div align="center">
 <table style="background-color:#ffffff">
     <tbody>
     <tr style="page-break-inside: avoid;">
@@ -175,6 +189,7 @@ text-align: center
                 </tbody>
             </table>
         </td>
+        <td class="spacer"></td>
         <td valign="bottom" align="left">
             <table height="100" cellpadding="0" cellspacing="2" class="deal" border="0">
                 <tbody>
@@ -234,8 +249,8 @@ text-align: center
 
     </tbody>
 </table>
-    <div align="center">
-        <table cellpadding="1" class="hy">
+    <div align="center"  style="margin-top: 15px;" width="100%">
+        <table cellpadding="1" class="hy"  width="100%">
             <tbody>
             <tr class="">
                 <th align="center">NS</th>
@@ -283,9 +298,10 @@ text-align: center
     if (window.mobileCheck()) {
         const number = parseInt({{board.b}});
         const maxBoards = parseInt({{maxboard}});
+        const range=9;
         Array.prototype.forEach.call(document.getElementsByClassName("btn-nav"), function(el) {
             const current = parseInt(el.text)
-            if((current - number > Math.max(10, 21-number)) || (Math.min(number, maxBoards-10) - current > 10)) {
+            if((current - number > Math.max(range, 2*range+1-number)) || (Math.min(number, maxBoards-range) - current > range)) {
                 el.classList.add('hidden')
             }
         })
