@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Yerevan Bridge Club{% endblock %}
+{% block content %}
+<h1>Rating list</h1>
+<div align="center">
+    <table class="hy"><tbody>
+    <tr><th>Names</th><th>Played</th><th>Wins</th><th>Avg %</th></tr>
+    {% for p in pairs %}
+    <tr>
+        <td>{{p.names}}</td>
+        <td>{{p.played}}</td>
+        <td>{{p.wins}}</td>
+        <td>{{p.avg}}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+</div>
+{% endblock %}
