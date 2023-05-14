@@ -1,6 +1,7 @@
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, make_response, request
 from util import Dict2Class, connect, nbsp_names, hcp
+from urllib.parse import urlparse
 
 VULNERABILITY = ["e",
                  "-", "n", "e", "b",
@@ -18,6 +19,51 @@ app = Flask(__name__)
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+@app.route("/sitemap")
+@app.route("/sitemap/")
+@app.route("/sitemap.xml")
+def sitemap():
+    """
+        Route to dynamically generate a sitemap of your website/application.
+        lastmod and priority tags omitted on static pages.
+        lastmod included on dynamic content such as blog posts.
+    """
+
+    host_components = urlparse(request.host_url)
+    host_base = host_components.scheme + "://" + host_components.netloc
+
+    # Static routes with static content
+    static_urls = list()
+    for rule in app.url_map.iter_rules():
+        if not str(rule).startswith("/admin") and not str(rule).startswith("/user"):
+            if "GET" in rule.methods and len(rule.arguments) == 0:
+                url = {
+                    "loc": f"{host_base}{str(rule)}"
+                }
+                static_urls.append(url)
+
+    # Dynamic routes with dynamic content
+    dynamic_urls = list()
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(f'select tournament_id,boards,players from tournaments order by date desc')
+    data = cursor.fetchall()
+    conn.close()
+    for (tournament_id, boards, players) in data:
+        dynamic_urls.append({"loc": f"{host_base}/result/{tournament_id}/ranks"})
+        dynamic_urls.extend(({'loc': f'{host_base}/result/{tournament_id}/scorecard/{i}'}
+                             for i in range(1, players + 1)))
+        dynamic_urls.extend(({'loc': f'{host_base}/result/{tournament_id}/board/{i}'}
+                             for i in range(1, boards + 1)))
+
+    xml_sitemap = render_template("sitemap.xml", static_urls=static_urls, dynamic_urls=dynamic_urls,
+                                  host_base=host_base)
+    response = make_response(xml_sitemap)
+    response.headers["Content-Type"] = "application/xml"
+
+    return response
 
 
 @app.route('/')
@@ -53,7 +99,7 @@ def pairs():
     array_to_string((select array (select trim(unnest(string_to_array(partnership, ' & '))) as a order by a)), ' & ') p, 
     avg(percent) avg_percent, count(*) played, 
     count(case left(rank, 2) when '1−' then 1 when '1' then 1 else null end) wins 
-    from names group by p order by wins desc""")
+    from names group by p order by wins desc, avg_percent desc""")
     data = cursor.fetchall()
     return render_template('pairs.html', pairs=[Dict2Class(
         {'names': d[0], 'played': d[2], 'avg': round(d[1], 2), 'wins': d[3]}) for d in data])
@@ -192,5 +238,3 @@ def board(tournament_id, board_number):
     conn.close()
     return render_template('travellers_template_web.html', scoring_short=scoring_short, board=current_board,
                            tournament_id=tournament_id, maxboard=data[1])
-
-
