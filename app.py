@@ -157,6 +157,7 @@ def scorecard(tournament_id, pair_number):
 
     boards_per_round = data[1] // data[-1]
     vul = {'-': "−", "n": "NS", "e": "EW", "b": "ALL"}
+    total_mps = 0
     for i in range(1, data[1] + 1):
         p = [pers for pers in personals if pers[1] == i]
         if not p:
@@ -187,6 +188,9 @@ def scorecard(tournament_id, pair_number):
                                        "percent": round(mp/max_mp, 2),
                                        "mp_per_round": round(mp_for_round, 2),
                                        "opp_names": opp_names}))
+        total_mps += mp
+    if pair.mp_total < total_mps - 0.5:  # rounding error
+        pair.penalties = pair.mp_total - total_mps
     conn.close()
     return render_template('scorecards_template_web.html', scoring_short=scoring_short, max_mp=data[3],
                            boards_per_round=boards_per_round, pair=pair, tournament_id=tournament_id)

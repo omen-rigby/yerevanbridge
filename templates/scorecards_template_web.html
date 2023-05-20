@@ -48,6 +48,16 @@
       {% endif %}
     </tr>
     {% endfor %}
+    {% if pair.penalties %}
+    <tr>
+      {% if scoring == "MPs" %}
+      <th colspan="8">Penalties</th>
+      {% else %}
+      <th colspan="7">Penalties</th>
+      {% endif %}
+      <td>{{pair.penalties}}</td>
+    </tr>
+    {% endif %}
   </tbody></table>
 </div>
 {% endblock %}
