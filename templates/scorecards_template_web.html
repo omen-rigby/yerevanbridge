@@ -31,7 +31,7 @@
       <th align="center">Opps</th></tr>
     {% for board in pair.boards %}
     <tr>
-      <td align="center"><a href="/result/{{tournament_id}}/board/{{board.number}}">{{board.number}}</a></td>
+      <td align="center"><a href="/result/{{tournament_id}}/board/{{board.number}}">{{(board.number - 1) % 100 + 1}}</a></td>
       <td align="center">{{board.vul}}</td>
       <td align="center">{{board.dir}}</td>
       <td align="center" class="{{board.suspicious}}">{{board.contract|safe}}</td>
@@ -42,9 +42,9 @@
       <td align="center">{{board.percent}}</td>
       {% endif %}
       <td align="center">{{board.mp}}</td>
-      {% if loop.index0 % boards_per_round == 0 %}
-      <td rowspan="{{boards_per_round}}" class="round">{{board.mp_per_round}}</td>
-      <td rowspan="{{boards_per_round}}" class="round" align="left">{{board.opp_names|safe}}</td>
+      {% if board.boards_per_round > 1 %}
+      <td rowspan="{{board.boards_per_round}}" class="round">{{board.mp_per_round}}</td>
+      <td rowspan="{{board.boards_per_round}}" class="round" align="left">{{board.opp_names|safe}}</td>
       {% endif %}
     </tr>
     {% endfor %}

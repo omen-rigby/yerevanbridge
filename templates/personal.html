@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{name}}{% endblock %}
+{% block content %}
+<h1>Masterpoints stats for {{name}}</h1>
+<div align="center">
+    <table class="hy"><tbody>
+    <tr><th>Date</th><th>Rank</th><th>Masterpoints</th></tr>
+    {% for r in results %}
+    <tr>
+        <td><a href="/result/{{r.tournament_id}}/ranks">{{r.date}}</a></td>
+        <td>{{r.rank}}</td>
+        <td>{{r.masterpoints}}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+</div>
+{% endblock %}

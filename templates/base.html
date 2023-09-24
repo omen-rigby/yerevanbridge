@@ -22,6 +22,7 @@
         <li id="home">Home</li>
         <li id="tournaments">Tournaments</li>
         <li id="rating">Rating</li>
+        <li id="pairs">Pairs</li>
         </ul>
     </div>
     <div class=".flex-wrapper">
@@ -57,20 +58,14 @@
                 slider.classList.toggle('showslide')
             }
         });
-        document.getElementById("home").addEventListener("click", function(){
-            if(window.location.pathname != "/"){
-                window.location ="/";
-            }
-        })
-        document.getElementById("tournaments").addEventListener("click", function(){
-            if(window.location.pathname != "/tournaments"){
-                window.location = "/tournaments";
-            }
-        })
-        document.getElementById("rating").addEventListener("click", function(){
-            if(window.location.pathname != "/rating"){
-                window.location = "/rating";
-            }
+        ["home", "tournaments", "rating", "pairs"].forEach((element, index) => {
+
+            document.getElementById(element).addEventListener("click", function(){
+                let path = element == "home" ? "/" : "/" + element
+                if(window.location.pathname != path){
+                    window.location = path;
+                }
+            })
         })
     </script>
     {% endblock %}

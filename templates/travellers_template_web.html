@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Board {{board.b}} - Travellers{% endblock %}
+{% block title %}Board {{(board.b - 1) % 100 + 1}} - Travellers{% endblock %}
 {% block styles %}
 <style>
 table.deal, table.deal td {
@@ -93,25 +93,26 @@ text-align: center
     <nav>
         <a href="/result/{{tournament_id}}/ranks" class="header-link">Ranks</a>
         {% if board.b > 1 %}
-        <a href="/result/{{tournament_id}}/board/{{board.b - 1}}" class="btn-nav arrow">&#x25C4;</a>
+        <a href="/result/{{tournament_id}}/board/{{board.played_boards[board.played_boards.index(board.b) - 1]}}" class="btn-nav arrow">&#x25C4;</a>
         {% endif %}
-        {% for i in range(1, maxboard + 1) %}
+        {% for i in board.played_boards %}
+        {% if i > 1 and (i - 1) % 100 == 0 %}<br/>{% endif %}
         {% if i == board.b %}
         {% if i < 10 %}
-        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit current-board">{{i}}</a>
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit current-board">{{(i - 1) % 100 + 1}}</a>
         {% else %}
-        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav current-board">{{i}}</a>
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav current-board">{{(i - 1) % 100 + 1}}</a>
         {% endif %}
         {% else %}
         {% if i < 10 %}
-        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit">{{i}}</a>
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit">{{(i - 1) % 100 + 1}}</a>
         {% else %}
-        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav">{{i}}</a>
+        <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav">{{(i - 1) % 100 + 1}}</a>
         {% endif %}
         {% endif %}
         {% endfor %}
-        {% if board.b != maxboard %}
-        <a href="/result/{{tournament_id}}/board/{{board.b + 1}}" class="btn-nav arrow">&#x25BA;</a>
+        {% if board.b != board.played_boards[-1] %}
+        <a href="/result/{{tournament_id}}/board/{{board.played_boards[board.played_boards.index(board.b) + 1]}}" class="btn-nav arrow">&#x25BA;</a>
         {% endif %}
     </nav>
 </div>
@@ -157,11 +158,11 @@ text-align: center
                         <tr>
                            {% if board.b < 10 %}
                             <td class="w {{board.ew_vul}} {{board.w_dealer}}"><font size="+1">W</font></td>
-                            <td class="digits" style="padding-left: 2px"><font color="#0000bb" size="+1"><b>{{board.b}}</b></font></td>
+                            <td class="digits" style="padding-left: 2px"><font color="#0000bb" size="+1"><b>{{(board.b - 1) % 100 + 1}}</b></font></td>
                             <td class="e {{board.ew_vul}} {{board.e_dealer}}"><font size="+1">E</font></td></tr>
                             {% else %}
                             <td class="w {{board.ew_vul}} {{board.w_dealer}}" style="padding-left: 5px;"><font size="+1">W</font></td>
-                            <td class="digits"><font color="#0000bb" size="+1"><b>{{board.b}}</b></font></td>
+                            <td class="digits"><font color="#0000bb" size="+1"><b>{{(board.b - 1) % 100 + 1}}</b></font></td>
                             <td class="e {{board.ew_vul}} {{board.e_dealer}}" style="padding-right: 5px;"><font size="+1">E</font></td></tr>
 
                         {% endif %}
@@ -264,7 +265,7 @@ text-align: center
                 <th align="center">EW</th>
             </tr>
             {% for table in board.tables %}
-            <tr >
+            <tr>
                 <td align="center" class="names">
                     <a href="/result/{{tournament_id}}/scorecard/{{table.ns}}">{{table.ns_name|safe}}</a></td>
 

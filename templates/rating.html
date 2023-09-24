@@ -8,7 +8,7 @@
     {% for p in players %}
     <tr>
         <td>{{loop.index}}</td>
-        <td>{{p.name}}</td>
+        <td><a href="/personal/{{p.id}}">{{p.name}}</a></td>
         <td>{{p.rating}}</td>
         <td>{{p.last_year}}</td>
         <td>{{p.rank}}</td>
