@@ -7,8 +7,13 @@
     <tr><th>Date</th><th>Rank</th><th>Masterpoints</th></tr>
     {% for r in results %}
     <tr>
-        <td><a href="/result/{{r.tournament_id}}/ranks">{{r.date}}</a></td>
-        <td>{{r.rank}}</td>
+        <td>
+            {%if r.tournament_id %}
+            <a href="/result/{{r.tournament_id}}/ranks">{{r.date}}</a></td>
+            {% else %}
+            {{r.date}}
+            {% endif %}
+        <td>{{r.rank or ''}}</td>
         <td>{{r.masterpoints}}</td>
     </tr>
     {% endfor %}

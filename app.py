@@ -140,10 +140,13 @@ def personal(player_id):
 select results.masterpoints, results.tournament_id, results."date", results."rank" from results 
 where player = '{player_name}' order by tournament_id DESC''')
         data = cursor.fetchall()
+        cursor.execute(f"""select masterpoints, NULL, "date", NULL from matches where player='{player_name}'""")
+        match_results = cursor.fetchall()
+        all_results = list(reversed(sorted(data + match_results, key=lambda x:x[2])))
     finally:
         conn.close()
     return render_template('personal.html', name=player_name, results=[Dict2Class({
-        'masterpoints': d[0], 'tournament_id': d[1], "date": d[2], "rank": d[3]}) for d in data])
+        'masterpoints': d[0], 'tournament_id': d[1], "date": d[2], "rank": d[3]}) for d in all_results])
 
 
 @app.route('/result/<tournament_id>/ranks')
