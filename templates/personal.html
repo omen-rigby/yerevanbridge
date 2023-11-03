@@ -4,7 +4,7 @@
 <h1>Masterpoints stats for {{name}}</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Date</th><th>Rank</th><th>Masterpoints</th></tr>
+    <tr><th>Date</th><th>Rank</th><th>Masterpoints</th><th>Partner</th></tr>
     {% for r in results %}
     <tr>
         <td>
@@ -15,6 +15,7 @@
             {% endif %}
         <td>{{r.rank or ''}}</td>
         <td>{{r.masterpoints}}</td>
+        <td>{{r.partner or ''}}</td>
     </tr>
     {% endfor %}
     </tbody></table>

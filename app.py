@@ -69,7 +69,45 @@ def sitemap():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f"""select value from strings where "key"='home'""")
+        home_page_html = cursor.fetchone()[0]
+        page = render_template('home.html', homepage_html=home_page_html)
+    except:
+        page = render_template('home.html')
+    finally:
+        conn.close()
+
+    return page
+
+
+@app.route('/contest')
+def contest():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f'''
+with results as (
+    select trim(unnest(string_to_array(partnership, ' & '))) player, masterpoints  from names  
+	left join tournaments  on names.tournament_id = tournaments.tournament_id
+    where masterpoints > 0 and names.tournament_id > 0 and "date" >= '2023-10-08'::date
+), all_results as (select * from results union all select player, masterpoints from matches where "date" >= '2023-10-08'::date)
+SELECT
+	player,
+	SUM (masterpoints) total
+FROM
+	all_results left join players on trim(players.full_name) = all_results.player
+	where players."rank" < 18
+GROUP BY
+	player
+order by total desc''')
+        data = cursor.fetchall()
+    finally:
+        conn.close()
+    contestants = [Dict2Class({'name': d[0], 'masterpoints': d[1]}) for d in data]
+    return render_template('contest.html', contestants=contestants)
 
 
 @app.route('/tournaments')
@@ -133,20 +171,21 @@ def personal(player_id):
         player_name = cursor.fetchone()[0].strip()
         cursor.execute(f'''WITH results AS
 (
-    select trim(unnest(string_to_array(partnership, ' & '))) player, masterpoints, "rank", names.tournament_id, 
+    select trim(unnest(string_to_array(partnership, ' & '))) player, partnership , masterpoints, "rank", names.tournament_id, 
     "date"  from names  left join tournaments  on names.tournament_id = tournaments.tournament_id 
     where masterpoints > 0 and names.tournament_id > 0
 )
-select results.masterpoints, results.tournament_id, results."date", results."rank" from results 
+select results.masterpoints, results.tournament_id, results."date", results."rank", 
+    replace(replace(results.partnership, '{player_name} & ', ''), ' & {player_name}', '') partner from results 
 where player = '{player_name}' order by tournament_id DESC''')
         data = cursor.fetchall()
-        cursor.execute(f"""select masterpoints, NULL, "date", NULL from matches where player='{player_name}'""")
+        cursor.execute(f"""select masterpoints, NULL, "date", NULL, NULL from matches where player='{player_name}'""")
         match_results = cursor.fetchall()
         all_results = list(reversed(sorted(data + match_results, key=lambda x:x[2])))
     finally:
         conn.close()
     return render_template('personal.html', name=player_name, results=[Dict2Class({
-        'masterpoints': d[0], 'tournament_id': d[1], "date": d[2], "rank": d[3]}) for d in all_results])
+        'masterpoints': d[0], 'tournament_id': d[1], "date": d[2], "rank": d[3], "partner": d[4]}) for d in all_results])
 
 
 @app.route('/result/<tournament_id>/ranks')

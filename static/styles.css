@@ -216,6 +216,41 @@ background-color: #ffffff;
 display: none;
 opacity: 0;
 }
+@media (min-width: 858px) {
+    html {
+        font-size: 22px;
+    }
+}
+
+@media (min-width: 780px) {
+    html {
+        font-size: 21px;
+    }
+}
+
+@media (min-width: 702px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media (min-width: 624px) {
+    html {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 623px) {
+    html {
+        font-size: 18px;
+    }
+}
+#content {
+margin-top: 100px;
+}
+div,p,span {
+	FONT-FAMILY: Arial;
+}
 h1 {
 	FONT-SIZE: 18pt; FONT-FAMILY: Arial; FONT-WEIGHT: bold; COLOR: #000000; TEXT-ALIGN: center; align: center
 }
