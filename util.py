@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import math
 import urllib.parse as up
 
 
@@ -34,3 +35,14 @@ def nbsp_names(text):
 def hcp(hand):
     h = hand.lower()
     return 4 * h.count('a') + 3 * h.count('k') + 2 * h.count('q') + h.count('j')
+
+
+def vp(score, boards):
+    """https://www.bridgebase.com/forums/topic/55389-wbf-vp-scale-changes/page__p__667202#entry667202"""
+    phi = (5 ** .5 - 1) / 2
+    b = 15 * (boards ** .5)
+    margin = abs(score)
+    vp_winner = 10 + 10 * ((1 - phi ** (3 * margin / b)) / (1 - phi ** 3))
+    vp_winner = min(round(math.floor(vp_winner * 1000) / 1000, 2), 20)
+    vp_loser = 20 - vp_winner
+    return vp_winner if score > 0 else vp_loser

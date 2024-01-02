@@ -1,7 +1,7 @@
 import os
 import itertools
 from flask import Flask, render_template, send_from_directory, make_response, request
-from util import Dict2Class, connect, nbsp_names, hcp
+from util import Dict2Class, connect, nbsp_names, hcp, vp
 from urllib.parse import urlparse
 
 VULNERABILITY = ["e",
@@ -196,10 +196,20 @@ def ranks(tournament_id):
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')
         data = cursor.fetchone()
         cursor.execute(f"select * from names where tournament_id={tournament_id} order by regexp_replace(rank, '[-−−–].*', '', 'g')::int")
-        totals = cursor.fetchall()
+        totals = [list(c) for c in cursor.fetchall()]
+        if data[4] == 'Swiss IMPs':
+            cursor.execute(f'select ns, ew, mp_ns, mp_ew from protocols where tournament_id={tournament_id} order by number')
+            protocols = cursor.fetchall()
+            for t in totals:
+                t[5] = 0
+                for p in protocols:
+                    t[5] += p[2] * (p[0] == t[1]) + p[3] * (p[1] == t[1])
+
     finally:
         conn.close()
-    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]), "mp": total[4],
+
+    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]), "mp": total[5],
+                               "vp": total[4],
                                "percent": total[5], "masterpoints": total[6] or '', "masterpoints_ru": total[7] or ''})
                    for total in totals]
     return render_template('rankings_template_web.html', scoring= data[4], max=data[3], tables=data[2] // 2,
@@ -226,9 +236,10 @@ def scorecard(tournament_id, pair_number):
     finally:
         conn.close()
     max_mp = (data[2] // 2 - 1) * 2
-    scoring_short = data[4].rstrip("s").replace("Cross-", "X")
-    pair = Dict2Class({"name": nbsp_names(pair_results[1]), "number": pair_number, "scoring": data[4],
-                       "mp_total": pair_results[3],
+    scoring_short = data[4].rstrip("s").replace("Cross-", "X").replace('Swiss ', '')
+    pair = Dict2Class({"name": nbsp_names(pair_results[1]), "number": pair_number,
+                       "mp_total": 0,
+                       "vp_total": pair_results[3],
                        "percent_total": pair_results[4],
                        "rank": pair_results[2], "boards": []})
 
@@ -239,6 +250,9 @@ def scorecard(tournament_id, pair_number):
         result = [p for p in personals if p[1] == b]
         opps.append([result[0][2] + result[0][3] - pair_number if result else None])
     boards_per_round_candidates = [sum(1 for _ in group) for _, group in itertools.groupby(opps)]
+    if data[4] == 'Swiss IMPs':
+        boards_per_round_candidates = [min(boards_per_round_candidates)] \
+                                      * (len(played_boards) // min(boards_per_round_candidates))
     round_sums = [sum(boards_per_round_candidates[:i]) for i in range(len(boards_per_round_candidates))]
     round_sums.extend([data[1], data[1] * 2 - round_sums[-1]])
     for i in range(1, max(played_boards) + 1):
@@ -268,8 +282,10 @@ def scorecard(tournament_id, pair_number):
         opp_names = nbsp_names([n for n in names if n[0] == opps][0][1])
         mp = p[index] or 0
         number_diff = i - 1 - board_index
+        pair.mp_total += mp
         mp_for_round = sum(res[index] for res in personals
                            if left_margin < res[1] - number_diff <= right_margin)
+        vp_for_round = vp(mp_for_round, boards_per_round)
 
 
         pair.boards.append(Dict2Class({"number": i, "vul": vul[VULNERABILITY[i % 16]],
@@ -278,13 +294,14 @@ def scorecard(tournament_id, pair_number):
                                        "score": p[7] if p[7] != 1 else '', "mp": mp,
                                        "percent": round(mp/max_mp, 2),
                                        "mp_per_round": round(mp_for_round, 2),
+                                       "vp": round(vp_for_round, 2),
                                        "opp_names": opp_names,
                                        "boards_per_round": boards_per_round}))
         total_mps += mp
     if pair.mp_total < total_mps - 0.5:  # rounding error
         pair.penalties = pair.mp_total - total_mps
     return render_template('scorecards_template_web.html', scoring_short=scoring_short, max_mp=data[3],
-                           pair=pair, tournament_id=tournament_id)
+                           pair=pair, tournament_id=tournament_id, scoring=data[4])
 
 
 @app.route('/result/<tournament_id>/board/<board_number>')
@@ -308,7 +325,7 @@ def board(tournament_id, board_number):
 
     finally:
         conn.close()
-    scoring_short = data[4].rstrip("s").replace("Cross-", "X")
+    scoring_short = data[4].rstrip("s").replace("Cross-", "X").replace('Swiss ', '')
     vul = {'-': "−", "n": "NS", "e": "EW", "b": "ALL"}
 
     repl_dict = {"d": hands[(board_number - 1) % 4].upper(), "b": board_number,

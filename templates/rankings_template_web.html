@@ -18,6 +18,8 @@
     <th align="center">Total</th>
     {% if scoring == "MPs" %}
     <th align="center">%Score</th>
+    {% elif scoring == "Swiss IMPs" %}
+    <th align="center">IMPs</th>
     {% endif %}
     <th align="center">Master Points</th>
     <th align="center">Master Points (RU)</th>
@@ -27,9 +29,14 @@
     <td align="center">{{pair.rank}}</td>
     <td align="center"><a href="/result/{{tournament_id}}/scorecard/{{pair.number}}">{{pair.number}}</a></td>
     <td align="left">{{pair.names|safe}}</td>
-    <td align="center">{{pair.mp}}</td>
     {% if scoring == "MPs" %}
+    <td align="center">{{pair.mp}}</td>
     <td align="center">{{pair.percent}}</td>
+    {% elif scoring == "Swiss IMPs" %}
+    <td align="center">{{pair.vp}}</td>
+    <td align="center">{{pair.mp}}</td>
+    {% else %}
+    <td align="center">{{pair.mp}}</td>
     {% endif %}
     <td align="center">{{pair.masterpoints}}</td>
     <td align="center">{{pair.masterpoints_ru}}</td>

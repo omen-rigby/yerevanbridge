@@ -9,6 +9,8 @@
 <h2>PAIR {{pair.number}} {{pair.name|safe}}</h2>
 {% if scoring_short == "MP" %}
 <h2>{{scoring_short}} {{pair.mp_total}} MaxMPs {{max_mp}} Score {{pair.percent_total}}% Rank {{pair.rank}}</h2>
+{% elif scoring == "Swiss IMPs" %}
+<h2>VP {{pair.vp_total}} IMPs {{pair.mp_total}} Rank {{pair.rank}}</h2>
 {% else %}
 <h2>{{scoring_short}} {{pair.mp_total}} Rank {{pair.rank}}</h2>
 {% endif %}
@@ -28,6 +30,9 @@
       {% endif %}
       <th align="center">{{scoring_short}}s</th>
       <th align="center">{{scoring_short}}s per round</th>
+      {% if scoring == "Swiss IMPs" %}
+      <th align="center">VP</th>
+      {% endif %}
       <th align="center">Opps</th></tr>
     {% for board in pair.boards %}
     <tr>
@@ -44,13 +49,16 @@
       <td align="center">{{board.mp}}</td>
       {% if board.boards_per_round > 1 %}
       <td rowspan="{{board.boards_per_round}}" class="round">{{board.mp_per_round}}</td>
+      {% if scoring == "Swiss IMPs" %}
+      <td rowspan="{{board.boards_per_round}}" class="round">{{board.vp}}</td>
+      {% endif %}
       <td rowspan="{{board.boards_per_round}}" class="round" align="left">{{board.opp_names|safe}}</td>
       {% endif %}
     </tr>
     {% endfor %}
     {% if pair.penalties %}
     <tr>
-      {% if scoring == "MPs" %}
+      {% if scoring == "MPs" or scoring == "Swiss IMPs" %}
       <th colspan="8">Penalties</th>
       {% else %}
       <th colspan="7">Penalties</th>
