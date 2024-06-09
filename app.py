@@ -1,6 +1,6 @@
 import os
 import itertools
-from flask import Flask, render_template, send_from_directory, make_response, request
+from flask import Flask, render_template, send_from_directory, make_response, request, abort
 from util import Dict2Class, connect, nbsp_names, hcp, vp
 from urllib.parse import urlparse
 
@@ -49,7 +49,8 @@ def sitemap():
     dynamic_urls = list()
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(f'select tournament_id,boards,players from tournaments order by date desc')
+    cursor.execute(f'''select tournament_id,boards,players from tournaments where 
+results_hidden_till is null or CURRENT_DATE > results_hidden_till order by date desc''')
     data = cursor.fetchall()
     conn.close()
     for (tournament_id, boards, players) in data:
@@ -90,23 +91,23 @@ def contest():
         cursor = conn.cursor()
         cursor.execute(f'''
 with results as (
-    select trim(unnest(string_to_array(partnership, ' & '))) player, masterpoints  from names  
-	left join tournaments  on names.tournament_id = tournaments.tournament_id
-    where masterpoints > 0 and names.tournament_id > 0 and "date" >= '2023-10-08'::date
-), all_results as (select * from results union all select player, masterpoints from matches where "date" >= '2023-10-08'::date)
+    select trim(unnest(string_to_array(partnership, ' & '))) player, 
+    (CASE WHEN "rank" like '%−%' THEN split_part("rank", '−', 1)::float8 else "rank"::float8 end) first_rank, 
+	(case when "rank" like '%−%' THEN split_part("rank", '−', 2)::float8 else "rank"::float8 end) last_rank
+	from names left join tournaments on names.tournament_id = tournaments.tournament_id
+    where names.tournament_id > 0 and "date" >= '2024-03-08'::date
+)
 SELECT
-	player,
-	SUM (masterpoints) total
+	player, SUM (11 - (first_rank + last_rank)/2) total
 FROM
-	all_results left join players on trim(players.full_name) = all_results.player
-	where players."rank" < 18
-GROUP BY
-	player
+results left join players on trim(players.full_name) = results.player
+	where players.gender = 'F'
+GROUP by player
 order by total desc''')
         data = cursor.fetchall()
     finally:
         conn.close()
-    contestants = [Dict2Class({'name': d[0], 'masterpoints': d[1]}) for d in data]
+    contestants = [Dict2Class({'name': d[0], 'total': d[1]}) for d in data]
     return render_template('contest.html', contestants=contestants)
 
 
@@ -115,7 +116,8 @@ def tournaments():
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'select tournament_id,date,scoring,players  from tournaments order by date desc')
+        cursor.execute(f'''select tournament_id,date,scoring,players  from tournaments where 
+results_hidden_till is null or CURRENT_DATE > results_hidden_till order by date desc''')
         data = cursor.fetchall()
         cursor.execute("""select tournament_id,"number",partnership from names where "rank"='1' or "rank" like '1−%'""")
         winners = cursor.fetchall()
@@ -140,7 +142,8 @@ def pairs():
         array_to_string((select array (select trim(unnest(string_to_array(partnership, ' & '))) as a order by a)), ' & ') p, 
         avg(percent) avg_percent, count(*) played, 
         count(case left(rank, 2) when '1−' then 1 when '1' then 1 else null end) wins 
-        from names where tournament_id > 0 group by p order by wins desc, avg_percent desc""")
+        from names left join tournaments  on names.tournament_id = tournaments.tournament_id where names.tournament_id > 0 
+        and tournaments.scoring = 'MPs' group by p order by wins desc, avg_percent desc""")
         data = cursor.fetchall()
     finally:
         conn.close()
@@ -167,25 +170,27 @@ def personal(player_id):
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'select full_name from players where id={player_id}')
-        player_name = cursor.fetchone()[0].strip()
+        cursor.execute(f'select full_name, id_ru from players where id={player_id}')
+        player_name, ru_id = cursor.fetchone()
+        player_name = player_name.strip()
         cursor.execute(f'''WITH results AS
 (
-    select trim(unnest(string_to_array(partnership, ' & '))) player, partnership , masterpoints, "rank", names.tournament_id, 
+    select trim(unnest(string_to_array(partnership, ' & '))) player, partnership , masterpoints, masterpoints_ru, "rank", names.tournament_id, 
     "date"  from names  left join tournaments  on names.tournament_id = tournaments.tournament_id 
-    where masterpoints > 0 and names.tournament_id > 0
+    where (masterpoints > 0 or masterpoints_ru > 0) and names.tournament_id > 0
 )
-select results.masterpoints, results.tournament_id, results."date", results."rank", 
+select results.masterpoints, results.masterpoints_ru, results.tournament_id, results."date", results."rank", 
     replace(replace(results.partnership, '{player_name} & ', ''), ' & {player_name}', '') partner from results 
 where player = '{player_name}' order by tournament_id DESC''')
         data = cursor.fetchall()
-        cursor.execute(f"""select masterpoints, NULL, "date", NULL, NULL from matches where player='{player_name}'""")
+        cursor.execute(f"""select masterpoints, masterpoints_ru, NULL, "date", NULL, NULL from matches where player='{player_name}'""")
         match_results = cursor.fetchall()
-        all_results = list(reversed(sorted(data + match_results, key=lambda x:x[2])))
+        all_results = list(reversed(sorted(data + match_results, key=lambda x:x[3])))
     finally:
         conn.close()
-    return render_template('personal.html', name=player_name, results=[Dict2Class({
-        'masterpoints': d[0], 'tournament_id': d[1], "date": d[2], "rank": d[3], "partner": d[4]}) for d in all_results])
+    return render_template('personal.html', name=player_name, ru_id=ru_id, results=[Dict2Class({
+        'masterpoints': d[0], 'masterpoints_ru': d[1], 'tournament_id': d[2], "date": d[3], "rank": d[4],
+        "partner": d[5]}) for d in all_results])
 
 
 @app.route('/result/<tournament_id>/ranks')
@@ -208,7 +213,8 @@ def ranks(tournament_id):
     finally:
         conn.close()
 
-    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]), "mp": total[5],
+    totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]),
+                               "mp": total[4 + 1 * ('Swiss' in data[4])],
                                "vp": total[4],
                                "percent": total[5], "masterpoints": total[6] or '', "masterpoints_ru": total[7] or ''})
                    for total in totals]
@@ -224,6 +230,9 @@ def scorecard(tournament_id, pair_number):
     try:
         conn = connect()
         cursor = conn.cursor()
+        cursor.execute(f"select tournament_id from tournaments where tournament_id={tournament_id} and (results_hidden_till is null or CURRENT_DATE > results_hidden_till)")
+        if not cursor.fetchone():
+            abort(404)
         cursor.execute(f"select distinct number from boards where tournament_id={tournament_id}")
         played_boards = set(b[0] for b in cursor.fetchall())
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')
@@ -292,7 +301,7 @@ def scorecard(tournament_id, pair_number):
                                        "dir": position, "contract": p[4],
                                        "declarer": p[5], "lead": p[6],
                                        "score": p[7] if p[7] != 1 else '', "mp": mp,
-                                       "percent": round(mp/max_mp, 2),
+                                       "percent": round(mp/max_mp * 100, 2),
                                        "mp_per_round": round(mp_for_round, 2),
                                        "vp": round(vp_for_round, 2),
                                        "opp_names": opp_names,
@@ -311,6 +320,9 @@ def board(tournament_id, board_number):
     try:
         conn = connect()
         cursor = conn.cursor()
+        cursor.execute(f"select tournament_id from tournaments where tournament_id={tournament_id} and (results_hidden_till is null or CURRENT_DATE > results_hidden_till)")
+        if not cursor.fetchone():
+            abort(404)
         cursor.execute(f"select distinct number from boards where tournament_id={tournament_id} order by number")
         played_boards = [b[0] for b in cursor.fetchall()]
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')

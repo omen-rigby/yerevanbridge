@@ -1,17 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Autumn Marathon-2023{% endblock %}
+{% block title %}Мартовское безумие-2024{% endblock %}
 {% block content %}
-<h1>Осенний марафон–2023</h1>
-<p align="center" width="50%">Это индивидуальный зачёт по набранным мастерским баллам
-  за&nbsp;все турниры/матчи
-  с&nbsp;8&nbsp;октября по&nbsp;31&nbsp;декабря.<br/>Приз&nbsp;—&nbsp;книга Зии Махмуда с автографом.
+<h1>Мартовское безумие–2024</h1>
+<p align="center" width="50%">Это индивидуальный зачёт среди женщин по&nbsp;местам
+  за&nbsp;все турниры
+  с&nbsp;8&nbsp;марта по&nbsp;7&nbsp;апреля.<br/>Приз&nbsp;—&nbsp;бутылка вина.
 </p>
-<div align="center"><img src="/static/zia.jpg" width="30%"/><img src="/static/zia2.jpeg" width="30%"/></div>
+<p align="center" width="50%">Формула подчёта очков: за&nbsp;первое место&nbsp;-&nbsp;10, за&nbsp;второе&nbsp;-&nbsp;9 и&nbsp;т.д.</p>
 <h2>Current standings</h2>
 <div align="center"><table><tbody>
-  <tr><th>Name</th><th>MPs</th></tr>
+  <tr><th>Name</th><th>Total</th></tr>
   {% for contestant in contestants %}
-  <tr><td style="text-align:right;padding-right:10px;">{{contestant.name}}</td><td style="text-align: center">{{contestant.masterpoints}}</td></tr>
+  <tr><td style="text-align:right;padding-right:10px;">{{contestant.name}}</td><td style="text-align: center">{{contestant.total}}</td></tr>
   {% endfor %}
 </tbody></table></div>
 {% endblock %}
