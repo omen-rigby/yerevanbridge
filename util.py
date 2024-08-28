@@ -46,3 +46,6 @@ def vp(score, boards):
     vp_winner = min(round(math.floor(vp_winner * 1000) / 1000, 2), 20)
     vp_loser = 20 - vp_winner
     return vp_winner if score > 0 else vp_loser
+
+def send_data_to_city_db():
+    pass

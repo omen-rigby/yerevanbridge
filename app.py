@@ -1,8 +1,12 @@
-import os
 import itertools
-from flask import Flask, render_template, send_from_directory, make_response, request, abort
-from util import Dict2Class, connect, nbsp_names, hcp, vp
+import os
+from flask import Flask, render_template, send_from_directory, make_response, request, abort, flash
+from util import Dict2Class, connect, nbsp_names, hcp, vp, send_data_to_city_db
+from result_form import ResultForm
 from urllib.parse import urlparse
+from flask_bootstrap import Bootstrap5
+
+from flask_wtf import FlaskForm, CSRFProtect
 
 VULNERABILITY = ["e",
                  "-", "n", "e", "b",
@@ -14,7 +18,10 @@ hands = "nesw"
 DENOMINATIONS = "cdhsn"
 
 app = Flask(__name__)
-
+app.secret_key = os.environ.get('CSRF_KEY') or 'tO$&!|0wkamvVia0?n$NqIRVWOG'
+bootstrap = Bootstrap5(app)
+# Flask-WTF requires this line
+csrf = CSRFProtect(app)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -81,6 +88,36 @@ def home():
     finally:
         conn.close()
 
+    return page
+
+
+@app.route('/top-players')
+def top_players():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f"""select value from strings where "key"='topPlayers'""")
+        page_html = cursor.fetchone()[0]
+        page = render_template('topPlayers.html', page_html=page_html)
+    except:
+        page = render_template('topPlayers.html')
+    finally:
+        conn.close()
+    return page
+
+
+@app.route('/championship')
+def championship():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f"""select value from strings where "key"='championship'""")
+        home_page_html = cursor.fetchone()[0]
+        page = render_template('championship.html', page_html=home_page_html)
+    except:
+        page = render_template('championship.html')
+    finally:
+        conn.close()
     return page
 
 
@@ -369,3 +406,25 @@ def board(tournament_id, board_number):
 
     return render_template('travellers_template_web.html', scoring_short=scoring_short, board=current_board,
                            tournament_id=tournament_id, maxboard=data[1])
+
+
+@app.route('/submit', methods=['GET', 'POST'])
+def submit():
+    message = ""
+    form = ResultForm(request.form)
+    contract = form.contract.data or ''
+    if contract == 'pass':
+        form.result.disabled = True
+    else:
+        form.result.disabled = False
+        if contract:
+            level = int(form.contract.data[0])
+            form.result.choices = [c for c in form._result_choices if 0 <= int(c[1]) + level <= level - 6]
+    if form.validate_on_submit():
+        city = form.city.data
+        if city:
+            try:
+                send_data_to_city_db()
+            except Exception as e:
+                message = str(e.message)
+    return render_template('submit.html', form=form, message=message)

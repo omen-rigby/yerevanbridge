@@ -1,6 +1,9 @@
-Flask==2.2.2
-gunicorn==20.1.0
-Jinja2==3.1.2
-MarkupSafe==2.1.1
-Werkzeug==2.2.2
-psycopg2-binary==2.9.5
+Flask==3.0.3
+bootstrap-flask==2.4.0
+flask_wtf==1.2.1
+gunicorn==23.0.0
+Jinja2==3.1.4
+MarkupSafe==2.1.5
+Werkzeug==3.0.4
+psycopg2-binary==2.9.9
+wtforms==3.1.2

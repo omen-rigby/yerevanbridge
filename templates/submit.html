@@ -1,0 +1,70 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends "base.html" %}
+{% block title %}Submit result{% endblock %}
+{% block content %}
+<div style="width:50%">
+<form method="post">
+    {{ render_form(form) }}
+<!--<div>Select club:-->
+<!--    <select name="city">-->
+<!--        <option value="Yerevan">Ереван</option>-->
+<!--        <option value="Voronezh">Воронеж</option>-->
+<!--        <option value="Yessentuki">Ессентуки</option>-->
+<!--        <option value="Izhevsk">Ижевск</option>-->
+<!--        <option value="Kursk">Курск</option>-->
+<!--    </select>-->
+<!--</div>-->
+<!--<div>Board # <input name="board" type="number" minlength="1" maxlength="3" size="1"/></div>-->
+<!--<div>NS <input name="ns" type="number"/> vs <input name="ew" type="number"/> EW</div>-->
+<!--<div>Contract: <input name="level" type="number" minlength="1" maxlength="1" size="1"/>-->
+<!--    <select name="denomination">-->
+<!--        <option value="c">♣</option>-->
+<!--        <option value="d">♦</option>-->
+<!--        <option value="h">♥</option>-->
+<!--        <option value="s">♠</option>-->
+<!--        <option value="n">NT</option>-->
+<!--    </select>-->
+<!--    <input type="checkbox" id="x"/><label for="x">X</label>-->
+<!--    <input type="checkbox" id="xx"/><label for="xx">XX</label>-->
+<!--    <input type="checkbox" id="pass"/><label for="x">PASS</label>-->
+<!--</div>-->
+<!--<div>Declarer: <select name="declarer">-->
+<!--        <option>N</option>-->
+<!--        <option>E</option>-->
+<!--        <option>S</option>-->
+<!--        <option>W</option>-->
+<!--    </select>-->
+<!--</div>-->
+<!--<div>Lead:</div>-->
+<!--<div>Result:</div>-->
+</form>
+    </div>
+<script charset="utf-8" type="text/javascript">
+$(function() {
+    var dropdown = {
+        state: $('#select_state'),
+        county: $('#select_county')
+    };
+
+    // call to update on load
+    //updateFields();
+
+    // function to call XHR and update county dropdown
+    function updateFields() {
+        var send = {
+            state: dropdown.state.val()
+        };
+        dropdown.county.attr('disabled', 'disabled');
+        dropdown.county.empty();
+
+    }
+
+    // event listener to state dropdown change
+    dropdown.state.on('change', function() {
+        updateCounties();
+    });
+
+});
+
+</script>
+{% endblock %}
