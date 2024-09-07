@@ -19,16 +19,18 @@
     </div>
     <div class="slider">
         <ul>
-        <li id="home">Home</li>
-        <li id="tournaments">Tournaments</li>
-        <li id="rating">Rating</li>
-        <li id="pairs">Pairs</li>
+        <li id="home">{{ _("Home") }}</li>
+        <li id="tournaments">{{ _("Tournaments") }}</li>
+        <li id="rating">{{ _("Rating") }}</li>
+        <li id="pairs">{{ _("Pairs") }}</li>
+        <li id="calendar">{{ _("Calendar") }}</li>
+        <li id="contacts">{{ _("Contacts") }}</li>
         </ul>
     </div>
     <div class=".flex-wrapper">
         <div id="content">{% block content %}{% endblock %}</div>
         <footer>
-            {% block footer %}<div align="center">Maintained by <a href="https://t.me/omen_rigby" target="_blank">Igor Bitkin</a></div>
+            {% block footer %}<div align="center">{{ _("Maintained by") }} <a href="https://t.me/omen_rigby" target="_blank">Igor Bitkin</a></div>
             {% endblock %}
         </footer>
         </div>
@@ -58,7 +60,7 @@
                 slider.classList.toggle('showslide')
             }
         });
-        ["home", "tournaments", "rating", "pairs"].forEach((element, index) => {
+        ["home", "tournaments", "rating", "pairs", "calendar", "contacts"].forEach((element, index) => {
 
             document.getElementById(element).addEventListener("click", function(){
                 let path = element == "home" ? "/" : "/" + element

@@ -398,3 +398,29 @@ width:17px;
              rgba(0,0,0,0) calc(50% + 0.8px),
              rgba(0,0,0,0) 100%);
 }
+
+.person {
+  width: 30%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  border-radius: 5px; /* 5px rounded corners */
+  margin: 10px;
+  align: top;
+}
+.person .pic {
+ margin-left:5%;
+ width:90%;
+      border-radius: 50%;
+
+
+}
+.person p.desc {
+  text-align: center;
+ }
+
+ .person img.icon {
+    width: 7%;
+    vertical-align: text-top;
+ }
+.person p:has(.icon) {
+margin-left:15%;
+}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Board {{(board.b - 1) % 100 + 1}} - Travellers{% endblock %}
+{% block title %}{{_("Board")}} {{(board.b - 1) % 100 + 1}} - Travellers{% endblock %}
 {% block styles %}
 <style>
 table.deal, table.deal td {
@@ -91,7 +91,7 @@ text-align: center
 {% block content %}
 <div align="center" style="margin-bottom: 10px">
     <nav>
-        <a href="/result/{{tournament_id}}/ranks" class="header-link">Ranks</a>
+        <a href="/result/{{tournament_id}}/ranks" class="header-link">{{_("Ranks")}}</a>
         {% if board.b > 1 %}
         <a href="/result/{{tournament_id}}/board/{{board.played_boards[board.played_boards.index(board.b) - 1]}}" class="btn-nav arrow">&#x25C4;</a>
         {% endif %}

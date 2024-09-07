@@ -1,8 +1,10 @@
 import os
 import itertools
 from flask import Flask, render_template, send_from_directory, make_response, request, abort
-from util import Dict2Class, connect, nbsp_names, hcp, vp
+from util import Dict2Class, connect, nbsp_names, hcp, vp, localize_names, static_page
 from urllib.parse import urlparse
+from flask_babel import Babel
+
 
 VULNERABILITY = ["e",
                  "-", "n", "e", "b",
@@ -14,6 +16,15 @@ hands = "nesw"
 DENOMINATIONS = "cdhsn"
 
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
+babel = Babel(app)
+
+
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+
+
+babel.init_app(app, locale_selector=get_locale)
 
 
 @app.route('/favicon.ico')
@@ -70,17 +81,49 @@ results_hidden_till is null or CURRENT_DATE > results_hidden_till order by date 
 
 @app.route('/')
 def home():
+    locale = get_locale()
+    return static_page('home', locale)
+
+
+@app.route('/calendar')
+def calendar():
+    locale = get_locale()
+    return static_page('calendar', locale)
+
+
+@app.route('/contacts')
+def contacts():
+    locale = get_locale()
+    return static_page('contacts', locale)
+
+
+@app.route('/top-players')
+def top_players():
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f"""select value from strings where "key"='home'""")
-        home_page_html = cursor.fetchone()[0]
-        page = render_template('home.html', homepage_html=home_page_html)
+        cursor.execute(f"""select value from strings where "key"='topPlayers'""")
+        page_html = cursor.fetchone()[0]
+        page = render_template('topPlayers.html', page_html=page_html)
     except:
-        page = render_template('home.html')
+        page = render_template('topPlayers.html')
     finally:
         conn.close()
+    return page
 
+
+@app.route('/championship')
+def championship():
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f"""select value from strings where "key"='championship'""")
+        home_page_html = cursor.fetchone()[0]
+        page = render_template('championship.html', page_html=home_page_html)
+    except:
+        page = render_template('championship.html')
+    finally:
+        conn.close()
     return page
 
 
@@ -113,6 +156,7 @@ order by total desc''')
 
 @app.route('/tournaments')
 def tournaments():
+    locale = get_locale()
     try:
         conn = connect()
         cursor = conn.cursor()
@@ -121,6 +165,7 @@ results_hidden_till is null or CURRENT_DATE > results_hidden_till order by date 
         data = cursor.fetchall()
         cursor.execute("""select tournament_id,"number",partnership from names where "rank"='1' or "rank" like '1−%'""")
         winners = cursor.fetchall()
+        winners = localize_names(cursor, winners, locale, 2)
     finally:
         conn.close()
     tournaments_list = []
@@ -144,7 +189,7 @@ def pairs():
         count(case left(rank, 2) when '1−' then 1 when '1' then 1 else null end) wins 
         from names left join tournaments  on names.tournament_id = tournaments.tournament_id where names.tournament_id > 0 
         and tournaments.scoring = 'MPs' group by p order by wins desc, avg_percent desc""")
-        data = cursor.fetchall()
+        data = localize_names(cursor, cursor.fetchall(), get_locale(), 0)
     finally:
         conn.close()
     return render_template('pairs.html', pairs=[Dict2Class(
@@ -153,13 +198,16 @@ def pairs():
 
 @app.route('/rating')
 def rating():
+    conn = None
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f'select id,full_name,rating,rank,rank_ru,last_year from players order by rating desc')
+        locale = get_locale()
+        cursor.execute(f'select id,full_name{("_"+locale) * (locale != "ru")},rating,rank,rank_ru,last_year from players order by rating desc')
         data = cursor.fetchall()
     finally:
-        conn.close()
+        if conn:
+            conn.close()
     return render_template('rating.html', players=[Dict2Class(
         {'id': d[0], 'name': d[1], 'rating': d[2], 'rank': d[3], 'rank_ru': "" if d[4] == 1.6 else d[4],
          'last_year': d[5] or ''}) for d in data])
@@ -167,12 +215,15 @@ def rating():
 
 @app.route('/personal/<player_id>')
 def personal(player_id):
+    conn = None
     try:
         conn = connect()
         cursor = conn.cursor()
+        locale = get_locale()
         cursor.execute(f'select full_name, id_ru from players where id={player_id}')
         player_name, ru_id = cursor.fetchone()
         player_name = player_name.strip()
+        player_name_localized = localize_names(cursor, player_name, locale)
         cursor.execute(f'''WITH results AS
 (
     select trim(unnest(string_to_array(partnership, ' & '))) player, partnership , masterpoints, masterpoints_ru, "rank", names.tournament_id, 
@@ -183,23 +234,29 @@ select results.masterpoints, results.masterpoints_ru, results.tournament_id, res
     replace(replace(results.partnership, '{player_name} & ', ''), ' & {player_name}', '') partner from results 
 where player = '{player_name}' order by tournament_id DESC''')
         data = cursor.fetchall()
+        data = localize_names(cursor, data, locale, 5)
         cursor.execute(f"""select masterpoints, masterpoints_ru, NULL, "date", NULL, NULL from matches where player='{player_name}'""")
         match_results = cursor.fetchall()
-        all_results = list(reversed(sorted(data + match_results, key=lambda x:x[3])))
+        all_results = list(reversed(sorted(data + match_results, key=lambda x: x[3])))
     finally:
-        conn.close()
-    return render_template('personal.html', name=player_name, ru_id=ru_id, results=[Dict2Class({
+        if conn:
+            conn.close()
+    return render_template('personal.html', name=player_name_localized, ru_id=ru_id, results=[Dict2Class({
         'masterpoints': d[0], 'masterpoints_ru': d[1], 'tournament_id': d[2], "date": d[3], "rank": d[4],
         "partner": d[5]}) for d in all_results])
 
 
 @app.route('/result/<tournament_id>/ranks')
 def ranks(tournament_id):
+    conn = None
     try:
         conn = connect()
+        locale = get_locale()
         cursor = conn.cursor()
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')
-        data = cursor.fetchone()
+        data = list(cursor.fetchone())
+        if data[6] == 'Клубный турнир - Ереван' and locale != 'ru':
+            data[6] = 'Club tournament - Yerevan' if locale == 'en' else 'Ակումբային մրցաշար - Երևան'
         cursor.execute(f"select * from names where tournament_id={tournament_id} order by regexp_replace(rank, '[-−−–].*', '', 'g')::int")
         totals = [list(c) for c in cursor.fetchall()]
         if data[4] == 'Swiss IMPs':
@@ -209,9 +266,12 @@ def ranks(tournament_id):
                 t[5] = 0
                 for p in protocols:
                     t[5] += p[2] * (p[0] == t[1]) + p[3] * (p[1] == t[1])
-
+        totals = localize_names(cursor, totals, locale, 2)
+    except Exception:
+        totals = []
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     totals_dict = [Dict2Class({"rank": total[3], "number": total[1], "names": nbsp_names(total[2]),
                                "mp": total[4 + 1 * ('Swiss' in data[4])],
@@ -227,6 +287,8 @@ def ranks(tournament_id):
 def scorecard(tournament_id, pair_number):
     tournament_id = int(tournament_id)
     pair_number = int(pair_number)
+    locale = get_locale()
+    conn = None
     try:
         conn = connect()
         cursor = conn.cursor()
@@ -238,12 +300,13 @@ def scorecard(tournament_id, pair_number):
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')
         data = cursor.fetchone()
         cursor.execute(f'select number, partnership, rank, mps, percent from names where tournament_id={tournament_id}')
-        names = cursor.fetchall()
+        names = localize_names(cursor, cursor.fetchall(), locale, 1)
         pair_results = [n for n in names if n[0] == pair_number][0]
         cursor.execute(f'select * from protocols where tournament_id={tournament_id} and (ew={pair_number} or ns={pair_number}) order by number')
         personals = cursor.fetchall()
     finally:
-        conn.close()
+        if conn:
+            conn.close()
     max_mp = (data[2] // 2 - 1) * 2
     scoring_short = data[4].rstrip("s").replace("Cross-", "X").replace('Swiss ', '')
     pair = Dict2Class({"name": nbsp_names(pair_results[1]), "number": pair_number,
@@ -317,6 +380,7 @@ def scorecard(tournament_id, pair_number):
 def board(tournament_id, board_number):
     tournament_id = int(tournament_id)
     board_number = int(board_number)
+    conn = None
     try:
         conn = connect()
         cursor = conn.cursor()
@@ -328,7 +392,7 @@ def board(tournament_id, board_number):
         cursor.execute(f'select * from tournaments where tournament_id={tournament_id}')
         data = cursor.fetchone()
         cursor.execute(f'select number, partnership from names where tournament_id={tournament_id}')
-        names = cursor.fetchall()
+        names = localize_names(cursor, cursor.fetchall(), get_locale(), 1)
         cursor.execute(f'select * from protocols where tournament_id={tournament_id} and number={board_number} order by mp_ns desc')
         personals = cursor.fetchall()
 
@@ -336,7 +400,8 @@ def board(tournament_id, board_number):
         board_data = cursor.fetchone()
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()
     scoring_short = data[4].rstrip("s").replace("Cross-", "X").replace('Swiss ', '')
     vul = {'-': "−", "n": "NS", "e": "EW", "b": "ALL"}
 
