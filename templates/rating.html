@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Rating{% endblock %}
+{% block title %}{{ _("Rating")}}{% endblock %}
 {% block content %}
-<h1>Rating list</h1>
+<h1>{{ _("Rating list")}}</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Position</th><th>Name</th><th>Rating</th><th>Last year</th><th>Rank</th><th>Rank RU</th></tr>
+    <tr><th>{{ _("Position")}}</th><th>{{ _("Name")}}</th><th>{{ _("Rating")}}</th><th>{{ _("Last year")}}</th><th>{{ _("Rank")}}</th><th>{{ _("Rank")}} RU</th></tr>
     {% for p in players %}
     <tr>
         <td>{{loop.index}}</td>

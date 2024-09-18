@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}{{name}}{% endblock %}
 {% block content %}
-<h1>Masterpoints stats for {{name}}</h1>
+<h1>{{ _("Masterpoints stats for")}} {{name}}</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Date</th><th>Rank</th><th>Masterpoints</th>
-        {% if ru_id > 0%}<th>Masterpoints RU</th>{% endif %}<th>Partner</th></tr>
+    <tr><th>{{ _("Date")}}</th><th>{{ _("Rank")}}</th><th>{{ _("Masterpoints")}}</th>
+        {% if ru_id > 0%}<th>{{ _("Masterpoints")}} RU</th>{% endif %}<th>{{ _("Partner")}}</th></tr>
     {% for r in results %}
     <tr>
         <td>

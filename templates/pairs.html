@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Yerevan Bridge Club{% endblock %}
 {% block content %}
-<h1>Pairs statistics (MPs)</h1>
+<h1>{{ _("Pairs statistics") }} (MPs)</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Names</th><th>Played</th><th>Wins</th><th>Avg %</th></tr>
+    <tr><th>{{ _("Names") }}</th><th>{{ _("Played") }}</th><th>{{ _("Wins") }}</th><th>{{ _("Avg")}} %</th></tr>
     {% for p in pairs %}
     <tr>
         <td>{{p.names}}</td>

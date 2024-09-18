@@ -1,2 +1,4 @@
 fly.toml
 .git
+**/messages.po
+messages.pot

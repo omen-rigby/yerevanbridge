@@ -1,0 +1,159 @@
+# Armenian translations for yerevanbridge.
+# Copyright (C) 2024 Igor Bitkin
+# This file is distributed under the same license as the yerevanbridge project.
+# Igor Bitkin <igor161b@gmail.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-09-07 12:38+0400\n"
+"PO-Revision-Date: 2024-09-02 21:50+0400\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: hy\n"
+"Language-Team: hy <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: templates/base.html:22
+msgid "Home"
+msgstr "Գլխավոր"
+
+#: templates/base.html:23
+msgid "Tournaments"
+msgstr "Մրցաշարեր"
+
+#: templates/base.html:24 templates/rating.html:2 templates/rating.html:7
+msgid "Rating"
+msgstr "Վարկանիշ"
+
+#: templates/base.html:25 templates/tournaments.html:7
+msgid "Pairs"
+msgstr "Զույգեր"
+
+#: templates/base.html:26 templates/calendar.html:2
+msgid "Calendar"
+msgstr "Օրացույց"
+
+#: templates/base.html:27 templates/contacts.html:2
+msgid "Contacts"
+msgstr "Կոնտակտներ"
+
+#: templates/base.html:33
+msgid "Maintained by"
+msgstr "Ադմինիստրատոր"
+
+#: templates/home.html:2
+msgid "Yerevan Bridge Club"
+msgstr ""
+
+#: templates/pairs.html:4
+msgid "Pairs statistics"
+msgstr "Զույգերի վիճակագրություն"
+
+#: templates/pairs.html:7 templates/rankings_template_web.html:17
+msgid "Names"
+msgstr "Անուններ"
+
+#: templates/pairs.html:7
+msgid "Played"
+msgstr "Խաղացած"
+
+#: templates/pairs.html:7
+msgid "Wins"
+msgstr "Հաղթանակ"
+
+#: templates/pairs.html:7
+msgid "Avg"
+msgstr "Միջին"
+
+#: templates/personal.html:4
+msgid "Masterpoints stats for"
+msgstr "Վարպետության կետեր"
+
+#: templates/personal.html:7 templates/tournaments.html:7
+msgid "Date"
+msgstr "Ամսաթիվ"
+
+#: templates/personal.html:7 templates/rankings_template_web.html:15
+#: templates/rating.html:7 templates/scorecards_template_web.html:11
+#: templates/scorecards_template_web.html:13
+#: templates/scorecards_template_web.html:15
+msgid "Rank"
+msgstr "Դիրք"
+
+#: templates/personal.html:7 templates/personal.html:8
+#: templates/rankings_template_web.html:24
+#: templates/rankings_template_web.html:25
+msgid "Masterpoints"
+msgstr "Վարպետության կետեր"
+
+#: templates/personal.html:8
+msgid "Partner"
+msgstr "Խաղ ընկեր"
+
+#: templates/rankings_template_web.html:2 templates/tournaments.html:7
+#: templates/tournaments.html:13
+msgid "Results"
+msgstr "Արդյունքներ"
+
+#: templates/rankings_template_web.html:6
+#: templates/rankings_template_web.html:8
+msgid "Table"
+msgstr "Սեղան"
+
+#: templates/rankings_template_web.html:6
+#: templates/rankings_template_web.html:8
+#: templates/travellers_template_web.html:2
+msgid "Board"
+msgstr "Բաշխում"
+
+#: templates/rankings_template_web.html:16
+#: templates/scorecards_template_web.html:9
+msgid "Pair"
+msgstr "Զույգ"
+
+#: templates/rankings_template_web.html:18
+msgid "Total"
+msgstr "Ընդամեն"
+
+#: templates/rating.html:4
+msgid "Rating list"
+msgstr "Վարկանիշ"
+
+#: templates/rating.html:7
+msgid "Position"
+msgstr "Դիրք"
+
+#: templates/rating.html:7
+msgid "Name"
+msgstr "Անուն"
+
+#: templates/rating.html:7
+msgid "Last year"
+msgstr "Անցյալ տարի"
+
+#: templates/scorecards_template_web.html:6
+#: templates/travellers_template_web.html:94
+msgid "Ranks"
+msgstr "Դիրքեր"
+
+#: templates/scorecards_template_web.html:11
+msgid "Score"
+msgstr "Վարկանիշ"
+
+#: templates/tournaments.html:4
+msgid "Latest tournaments"
+msgstr "Վերջին մրցաշարեր"
+
+#: templates/tournaments.html:7
+msgid "Scoring"
+msgstr "Վարկանիշ"
+
+#: templates/tournaments.html:7
+msgid "Winner"
+msgstr "Հաղթող"
+

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Tournaments{% endblock %}
 {% block content %}
-<h1>Latest tournaments</h1>
+<h1>{{_("Latest tournaments")}}</h1>
 <div align="center">
     <table class="hy"><tbody>
-    <tr><th>Date</th><th>Scoring</th><th>Pairs</th><th>Results</th><th>Winner</th></tr>
+    <tr><th>{{ _("Date")}}</th><th>{{ _("Scoring")}}</th><th>{{ _("Pairs")}}</th><th>{{ _("Results")}}</th><th>{{ _("Winner")}}</th></tr>
     {% for t in tournaments %}
     <tr class="{{'odd' if loop.index0 % 2 else 'even'}}">
         <td>{{t.date}}</td>
         <td>{{t.scoring}}</td>
         <td>{{t.players}}</td>
-        <td><a href="/result/{{t.id}}/ranks">Results</a></td>
+        <td><a href="/result/{{t.id}}/ranks">{{_("Results")}}</a></td>
         <td align="right">
             <a href="result/{{t.id}}/scorecard/{{t.winner_num}}">{{t.winner_names|safe}}</a>
         </td>

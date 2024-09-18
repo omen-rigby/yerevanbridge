@@ -3,16 +3,16 @@
 {% block content %}
 <div align="center" style="margin-bottom: 10px">
     <nav>
-        <a href="/result/{{tournament_id}}/ranks" class="header-link">Ranks</a>
+        <a href="/result/{{tournament_id}}/ranks" class="header-link">{{_("Ranks")}}</a>
     </nav>
 </div>
-<h2>PAIR {{pair.number}} {{pair.name|safe}}</h2>
+<h2>{{_("Pair")}} {{pair.number}} {{pair.name|safe}}</h2>
 {% if scoring_short == "MP" %}
-<h2>{{scoring_short}} {{pair.mp_total}} MaxMPs {{max_mp}} Score {{pair.percent_total}}% Rank {{pair.rank}}</h2>
+<h2>{{scoring_short}} {{pair.mp_total}} MaxMPs {{max_mp}} {{_("Score")}} {{pair.percent_total}}% {{_("Rank")}} {{pair.rank}}</h2>
 {% elif scoring == "Swiss IMPs" %}
-<h2>VP {{pair.vp_total}} IMPs {{pair.mp_total}} Rank {{pair.rank}}</h2>
+<h2>VP {{pair.vp_total}} IMPs {{pair.mp_total}} {{_("Rank")}} {{pair.rank}}</h2>
 {% else %}
-<h2>{{scoring_short}} {{pair.mp_total}} Rank {{pair.rank}}</h2>
+<h2>{{scoring_short}} {{pair.mp_total}} {{_("Rank")}} {{pair.rank}}</h2>
 {% endif %}
 <div align="center">
 <table style="FONT-SIZE: 10pt; FONT-FAMILY: Arial" class="hy">

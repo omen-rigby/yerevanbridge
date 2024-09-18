@@ -1,28 +1,28 @@
 {% extends "base.html" %}
-{% block title %}{{date}} {{tournament_title}} - Results{% endblock %}
+{% block title %}{{date}} {{tournament_title}} - {{_("Results")}}{% endblock %}
 {% block content %}
 <h1>{{tournament_title}} {{date}}</h1>
 {% if scoring == "MPs" %}
-<h2>{{tables}} Table {{boards}} Board Howell Movement. MAX = {{max}}</h2>
+<h2>{{tables}} {{_("Table")}} {{boards}} {{_("Board")}} Howell Movement. MAX = {{max}}</h2>
 {% else %}
-<h2>{{tables}} Table {{boards}} Board Howell Movement. Scoring = {{scoring}}</h2>
+<h2>{{tables}} {{_("Table")}} {{boards}} {{_("Board")}} Howell Movement. Scoring = {{scoring}}</h2>
 {% endif %}
 <h3><a href="/result/{{tournament_id}}/board/1">Travellers</a></h3>
 <div align="center">
 <table style="FONT-SIZE: 11pt; FONT-FAMILY: Arial" class="hy">
   <tbody>
   <tr>
-    <th align="center">Rank</th>
-    <th align="center">Pair</th>
-    <th align="left">Names</th>
-    <th align="center">Total</th>
+    <th align="center">{{_("Rank")}}</th>
+    <th align="center">{{_("Pair")}}</th>
+    <th align="left">{{_("Names")}}</th>
+    <th align="center">{{_("Total")}}</th>
     {% if scoring == "MPs" %}
     <th align="center">%Score</th>
     {% elif scoring == "Swiss IMPs" %}
     <th align="center">IMPs</th>
     {% endif %}
-    <th align="center">Master Points</th>
-    <th align="center">Master Points (RU)</th>
+    <th align="center">{{_("Masterpoints")}}</th>
+    <th align="center">{{_("Masterpoints")}} (RU)</th>
   </tr>
   {% for pair in totals %}
   <tr>
