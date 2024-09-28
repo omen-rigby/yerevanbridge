@@ -2,6 +2,7 @@ import os
 import psycopg2
 import math
 import urllib.parse as up
+import transliterate
 from flask import render_template
 
 
@@ -20,6 +21,11 @@ def static_page(key, locale):
             conn.close()
 
 
+def translit(text, locale):
+    latin = transliterate.translit(text, 'ru', reversed=True)
+    return latin if locale == 'en' else transliterate.translit(latin, locale)
+
+
 def localize_names(cursor, data, locale, index=None):
     return_first = False
     if locale != 'ru':
@@ -34,11 +40,13 @@ def localize_names(cursor, data, locale, index=None):
             if name is None:
                 continue
             if index is None:
-                data[i] = ' & '.join(map(lambda x: [n[1] for n in names if x.strip() == n[0].strip()][0],
+                data[i] = ' & '.join(map(lambda x: [n[1] or translit(n[0], locale)
+                                                    for n in names if x.strip() == n[0].strip()][0],
                                          name.split(' & ')))
             else:
                 try:
-                    new_value = list(map(lambda x: [n[1] for n in names if x.strip() == n[0].strip()][0],
+                    new_value = list(map(lambda x: [n[1] or translit(n[0], locale)
+                                                    for n in names if x.strip() == n[0].strip()][0],
                                          name[index].split(' & ')))
 
                     data[i] = list(data[i])

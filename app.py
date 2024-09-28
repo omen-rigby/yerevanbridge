@@ -1,7 +1,7 @@
 import os
 import itertools
 from flask import Flask, render_template, send_from_directory, make_response, request, abort
-from util import Dict2Class, connect, nbsp_names, hcp, vp, localize_names, static_page
+from util import Dict2Class, connect, nbsp_names, hcp, vp, localize_names, translit, static_page
 from urllib.parse import urlparse
 from flask_babel import Babel
 
@@ -203,14 +203,14 @@ def rating():
         conn = connect()
         cursor = conn.cursor()
         locale = get_locale()
-        cursor.execute(f'select id,full_name{("_"+locale) * (locale != "ru")},rating,rank,rank_ru,last_year from players order by rating desc')
+        cursor.execute(f'select id,full_name,full_name{("_"+locale) * (locale != "ru")},rating,rank,rank_ru,last_year from players order by rating desc')
         data = cursor.fetchall()
     finally:
         if conn:
             conn.close()
     return render_template('rating.html', players=[Dict2Class(
-        {'id': d[0], 'name': d[1], 'rating': d[2], 'rank': d[3], 'rank_ru': "" if d[4] == 1.6 else d[4],
-         'last_year': d[5] or ''}) for d in data])
+        {'id': d[0], 'name': d[2] or translit(d[1], locale), 'rating': d[3], 'rank': d[4],
+         'rank_ru': "" if d[5] == 1.6 else d[5], 'last_year': d[6] or ''}) for d in data])
 
 
 @app.route('/personal/<player_id>')
