@@ -1,9 +1,11 @@
 import os
 import itertools
 from flask import Flask, render_template, send_from_directory, make_response, request, abort
-from util import Dict2Class, connect, nbsp_names, hcp, vp, localize_names, translit, static_page
+from util import Dict2Class, connect, nbsp_names, hcp, vp, localize_names, translit, static_page, suits
 from urllib.parse import urlparse
-from flask_babel import Babel
+from flask_babel import Babel, format_date, gettext
+from babel.dates import format_date
+from markupsafe import Markup
 
 
 VULNERABILITY = ["e",
@@ -21,7 +23,7 @@ babel = Babel(app)
 
 
 def get_locale():
-    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or 'en'
 
 
 babel.init_app(app, locale_selector=get_locale)
@@ -88,13 +90,42 @@ def home():
 @app.route('/calendar')
 def calendar():
     locale = get_locale()
-    return static_page('calendar', locale)
+    try:
+        conn = connect()
+        cursor = conn.cursor()
+        cursor.execute(f"""select "date",date_start,title_{locale} from upcoming where "date">=CURRENT_DATE
+order by "date" desc""")
+        result = cursor.fetchall()
+        upcoming = [Dict2Class({
+                'date': format_date(t[0], format='short' if t[1] else 'long', locale=locale),
+                'date_start': format_date(t[1], format='short', locale=locale) if t[1] else '',
+                'title': t[2]})
+            for t in result]
+        cursor.execute('''select "date",title, tournament_id from tournaments  where featured is true
+order by date desc, tournament_id desc''')
+        past = [Dict2Class({'date': format_date(t[0], format='long', locale=locale), 'title': t[1],
+                            'id': t[2]})
+                for t in cursor.fetchall()]
+        page = render_template('calendar.html', upcoming=upcoming, past=past)
+
+    except:
+        raise
+        page = static_page('calendar', locale)
+    finally:
+        conn.close()
+    return page
 
 
 @app.route('/contacts')
 def contacts():
     locale = get_locale()
     return static_page('contacts', locale)
+
+
+@app.route('/ranks')
+def rank_system():
+    locale = get_locale()
+    return static_page('ranks', locale)
 
 
 @app.route('/top-players')
@@ -361,8 +392,8 @@ def scorecard(tournament_id, pair_number):
 
 
         pair.boards.append(Dict2Class({"number": i, "vul": vul[VULNERABILITY[i % 16]],
-                                       "dir": position, "contract": p[4],
-                                       "declarer": p[5], "lead": p[6],
+                                       "dir": position, "contract": Markup(suits(p[4])),
+                                       "declarer": p[5], "lead": Markup(suits(p[6].replace("T", "10"))),
                                        "score": p[7] if p[7] != 1 else '', "mp": mp,
                                        "percent": round(mp/max_mp * 100, 2),
                                        "mp_per_round": round(mp_for_round, 2),
@@ -407,7 +438,7 @@ def board(tournament_id, board_number):
 
     repl_dict = {"d": hands[(board_number - 1) % 4].upper(), "b": board_number,
                  "v": vul[VULNERABILITY[board_number % 16]],
-                 "minimax_contract": board_data[38], "minimax_outcome": board_data[39], "minimax_url": board_data[40],
+                 "minimax_contract": Markup(suits(board_data[38])), "minimax_outcome": board_data[39], "minimax_url": board_data[40],
                  "played_boards": played_boards}
     for i, h in enumerate(hands):
         for j, s in enumerate(SUITS):
@@ -426,9 +457,11 @@ def board(tournament_id, board_number):
 
     current_board = Dict2Class(repl_dict)
     for p in personals:
-        repl_dict = {"ns": p[2], "ew": p[3], "contract": p[4], "declarer": p[5], "lead": p[6],
-                     "nsplus": p[7] if p[7] > 1 else "", "nsminus": -p[7] if p[7] < 0 else "", "mp_ns": round(p[8], 2),
-                     "mp_ew": round(p[9], 2), "ns_name": nbsp_names([n[1] for n in names if n[0] == p[2]][0]),
+        repl_dict = {"ns": p[2], "ew": p[3], "contract": suits(p[4]), "declarer": p[5], "lead": suits(p[6]),
+                     "nsplus": p[7] if p[7] > 1 else "", "nsminus": -p[7] if p[7] < 0 else "",
+                     "mp_ns": round(p[8], 2),
+                     "mp_ew": round(p[9], 2),
+                     "ns_name": nbsp_names([n[1] for n in names if n[0] == p[2]][0]),
                      "ew_name": nbsp_names([n[1] for n in names if n[0] == p[3]][0]), "bbo_url": p[10]}
         current_board.tables.append(Dict2Class(repl_dict))
 

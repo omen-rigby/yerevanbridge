@@ -424,3 +424,17 @@ width:17px;
 .person p:has(.icon) {
 margin-left:15%;
 }
+
+
+.spades{
+  color:black;
+}
+.hearts{
+  color:red;
+}
+.diamonds {
+  color:#ff6600;
+}
+.clubs {
+  color:green;
+}

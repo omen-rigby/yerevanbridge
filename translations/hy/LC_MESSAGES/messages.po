@@ -1,13 +1,14 @@
 # Armenian translations for yerevanbridge.
 # Copyright (C) 2024 Igor Bitkin
-# This file is distributed under the same license as the yerevanbridge project.
+# This file is distributed under the same license as the yerevanbridge
+# project.
 # Igor Bitkin <igor161b@gmail.com>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-09-07 12:38+0400\n"
+"POT-Creation-Date: 2024-11-19 12:35+0200\n"
 "PO-Revision-Date: 2024-09-02 21:50+0400\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: hy\n"
@@ -26,7 +27,7 @@ msgstr "Գլխավոր"
 msgid "Tournaments"
 msgstr "Մրցաշարեր"
 
-#: templates/base.html:24 templates/rating.html:2 templates/rating.html:7
+#: templates/base.html:24 templates/rating.html:2 templates/rating.html:9
 msgid "Rating"
 msgstr "Վարկանիշ"
 
@@ -45,6 +46,18 @@ msgstr "Կոնտակտներ"
 #: templates/base.html:33
 msgid "Maintained by"
 msgstr "Ադմինիստրատոր"
+
+#: templates/calendar.html:4
+msgid "Tournament calendar"
+msgstr "Մրցաշարերի օրացույց"
+
+#: templates/calendar.html:7
+msgid "Upcoming"
+msgstr "Ապագա"
+
+#: templates/calendar.html:18
+msgid "Past"
+msgstr "Անցյալի"
 
 #: templates/home.html:2
 msgid "Yerevan Bridge Club"
@@ -79,7 +92,7 @@ msgid "Date"
 msgstr "Ամսաթիվ"
 
 #: templates/personal.html:7 templates/rankings_template_web.html:15
-#: templates/rating.html:7 templates/scorecards_template_web.html:11
+#: templates/scorecards_template_web.html:11
 #: templates/scorecards_template_web.html:13
 #: templates/scorecards_template_web.html:15
 msgid "Rank"
@@ -111,6 +124,11 @@ msgstr "Սեղան"
 msgid "Board"
 msgstr "Բաշխում"
 
+#: templates/rankings_template_web.html:10
+#: templates/travellers_template_web.html:2
+msgid "Travellers"
+msgstr "Travellers"
+
 #: templates/rankings_template_web.html:16
 #: templates/scorecards_template_web.html:9
 msgid "Pair"
@@ -128,13 +146,17 @@ msgstr "Վարկանիշ"
 msgid "Position"
 msgstr "Դիրք"
 
-#: templates/rating.html:7
+#: templates/rating.html:8
 msgid "Name"
 msgstr "Անուն"
 
-#: templates/rating.html:7
+#: templates/rating.html:10
 msgid "Last year"
 msgstr "Անցյալ տարի"
+
+#: templates/rating.html:11 templates/rating.html:12
+msgid "Title"
+msgstr "Կոչում"
 
 #: templates/scorecards_template_web.html:6
 #: templates/travellers_template_web.html:94

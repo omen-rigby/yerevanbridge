@@ -1,5 +1,27 @@
 {% extends "base.html" %}
 {% block title %}{{_("Calendar")}}{% endblock %}
 {% block content %}
-{{content|safe}}
+<h1>{{_("Tournament calendar")}}</h1>
+<div align="center">
+<table class="hy"><tdata>
+    <tr><th colspan="3">{{_("Upcoming")}}</th></tr>
+    {% for t in upcoming %}
+    <tr>
+        <td>{{t.title}}</td>
+        {% if t.date_start%}
+        <td>{{t.date_start}}–{{t.date}}</td>
+        {% else %}
+        <td>{{t.date}}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    <tr><th colspan="3">{{_("Past")}}</th></tr>
+        {% for t in past %}
+    <tr>
+        <td><a href="/result/{{t.id}}/ranks">{{t.title}}</a></td>
+        <td>{{t.date}}</td>
+    </tr>
+    {% endfor %}
+</tdata></table>
+</div>
 {% endblock %}

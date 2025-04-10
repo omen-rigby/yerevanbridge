@@ -1,10 +1,19 @@
 import os
+import re
 import psycopg2
 import math
 import urllib.parse as up
 import transliterate
 from flask import render_template
 
+DB_URL = os.environ.get('DB_URL')
+SUIT_REGEX = re.compile("([1-7]([SHDC]))|(([SDHC])[\dAKQJT])")
+SUIT_REPLACEMENT = {
+    'S': '<span class="spades">&spades;</span>',
+    'H': '<span class="hearts">&hearts;</span>',
+    'D': '<span class="diamonds">&diams;</span>',
+    'C': '<span class="clubs">&clubs;</span>'
+}
 
 def static_page(key, locale):
     conn = None
@@ -26,7 +35,14 @@ def translit(text, locale):
     return latin if locale == 'en' else transliterate.translit(latin, locale)
 
 
-def localize_names(cursor, data, locale, index=None):
+def suits(string):
+    if match := SUIT_REGEX.match(string):
+        character = match.group(2) or match.group(4)
+        string = string.replace(character, SUIT_REPLACEMENT[character])
+    return string
+
+
+def localize_names(cursor, data, locale='en', index=None):
     return_first = False
     if locale != 'ru':
         cursor.execute(f'''select full_name, full_name_{locale} from players''')
@@ -57,8 +73,7 @@ def localize_names(cursor, data, locale, index=None):
 
 
 def connect():
-    db_path = os.environ.get('DB_URL')
-    url = up.urlparse(db_path)
+    url = up.urlparse(DB_URL)
     return psycopg2.connect(database=url.path[1:],
                             user=url.username,
                             password=url.password,

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{_("Board")}} {{(board.b - 1) % 100 + 1}} - Travellers{% endblock %}
+{% block title %}{{_("Board")}} {{(board.b - 1) % 100 + 1}} - {{_("Travellers")}}{% endblock %}
 {% block styles %}
 <style>
 table.deal, table.deal td {
@@ -98,7 +98,7 @@ text-align: center
         {% for i in board.played_boards %}
         {% if i > 1 and (i - 1) % 100 == 0 %}<br/>{% endif %}
         {% if i == board.b %}
-        {% if i < 10 %}
+        {% if (i - 1) % 100 + 1 < 10 %}
         <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav one-digit current-board">{{(i - 1) % 100 + 1}}</a>
         {% else %}
         <a href="/result/{{tournament_id}}/board/{{i}}" class="btn-nav current-board">{{(i - 1) % 100 + 1}}</a>
@@ -136,18 +136,18 @@ text-align: center
                             </table>
                         </td>
                         <td>
-                            <img src="https://bridgemoscow.ru/images/spade.gif"/>{{board.ns}}<br/>
-                            <img src="https://bridgemoscow.ru/images/heart.gif"/>{{board.nh}}<br/>
-                            <img src="https://bridgemoscow.ru/images/diamond.gif"/>{{board.nd}}<br/>
-                            <img src="https://bridgemoscow.ru/images/club.gif"/>{{board.nc}}
+                            <span class="spades">&spades;</span>{{board.ns}}<br/>
+                            <span class="hearts">&hearts;</span>{{board.nh}}<br/>
+                            <span class="diamonds">&diams;</span>{{board.nd}}<br/>
+                            <span class="clubs">&clubs;</span>{{board.nc}}
                         </td>
                         <td>&nbsp; </td>
                     </tr>
                     <tr>
-                        <td><img src="https://bridgemoscow.ru/images/spade.gif"/>{{board.ws}}<br/>
-                    <img src="https://bridgemoscow.ru/images/heart.gif"/>{{board.wh}}<br/>
-                    <img src="https://bridgemoscow.ru/images/diamond.gif"/>{{board.wd}}<br/>
-                    <img src="https://bridgemoscow.ru/images/club.gif"/>{{board.wc}}
+                        <td><span class="spades">&spades;</span>{{board.ws}}<br/>
+                    <span class="hearts">&hearts;</span>{{board.wh}}<br/>
+                    <span class="diamonds">&diams;</span>{{board.wd}}<br/>
+                    <span class="clubs">&clubs;</span>{{board.wc}}
                         </td>
                         <td style="background-color:#ffffff">
                             <table class="number">
@@ -171,19 +171,19 @@ text-align: center
                     </table>
                         </td>
                         <td>
-                            <img src="https://bridgemoscow.ru/images/spade.gif"/>{{board.es}}<br/>
-		            <img src="https://bridgemoscow.ru/images/heart.gif"/>{{board.eh}}<br/>
-		            <img src="https://bridgemoscow.ru/images/diamond.gif"/>{{board.ed}}<br/>
-		            <img src="https://bridgemoscow.ru/images/club.gif"/>{{board.ec}}
+                            <span class="spades">&spades;</span>{{board.es}}<br/>
+		            <span class="hearts">&hearts;</span>{{board.eh}}<br/>
+		            <span class="diamonds">&diams;</span>{{board.ed}}<br/>
+		            <span class="clubs">&clubs;</span>{{board.ec}}
                         </td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                         <td>
-                            <img src="https://bridgemoscow.ru/images/spade.gif"/>{{board.ss}}<br/>
-                    <img src="https://bridgemoscow.ru/images/heart.gif"/>{{board.sh}}<br/>
-                    <img src="https://bridgemoscow.ru/images/diamond.gif"/>{{board.sd}}<br/>
-                    <img src="https://bridgemoscow.ru/images/club.gif"/>{{board.sc}}
+                            <span class="spades">&spades;</span>{{board.ss}}<br/>
+                            <span class="hearts">&hearts;</span>{{board.sh}}<br/>
+                            <span class="diamonds">&diams;</span>{{board.sd}}<br/>
+                            <span class="clubs">&clubs;</span>{{board.sc}}
                         </td>
                         <td>&nbsp;</td>
                     </tr>
@@ -192,22 +192,22 @@ text-align: center
         </td>
         <td class="spacer"></td>
         <td valign="bottom" align="left">
-            <table height="100" cellpadding="0" cellspacing="2" class="deal" border="0">
+            <table height="100" cellpadding="0" cellspacing="2" class="deal" border="0" style="table-layout: fixed;width:50%">
                 <tbody>
                 <tr>
-                    <td width="8%">&nbsp;</td>
-                    <th width="8%">NT</th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/spade.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/heart.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/diamond.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/club.gif"></th>
-                    <td rowspan="3" width="3%">&nbsp;</td>
-                    <td width="8%">&nbsp;</td>
-                    <th width="8%">NT</th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/spade.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/heart.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/diamond.gif"></th>
-                    <th width="8%"><img src="https://bridgemoscow.ru/images/club.gif"></th>
+                    <td>&nbsp;</td>
+                    <th>NT</th>
+                    <th><span class="spades">&spades;</span></th>
+                    <th><span class="hearts">&hearts;</span></th>
+                    <th><span class="diamonds">&diams;</span></th>
+                    <th><span class="clubs">&clubs;</span></th>
+                    <td rowspan="3">&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <th>NT</th>
+                    <th><span class="spades">&spades;</span></th>
+                    <th><span class="hearts">&hearts;</span></th>
+                    <th><span class="diamonds">&diams;</span></th>
+                    <th><span class="clubs">&clubs;</span></th>
                 </tr>
                 <tr>
                     <th>N</th>
@@ -239,7 +239,7 @@ text-align: center
                 </tr>
                 <tr>
                     <td colspan="13" align="center">
-                        <b>minimax = <a class="minimax_url" href="{{board.minimax_url}}" target="_blank">{{board.minimax_contract|safe}}</a> {{board.minimax_outcome}}</b>
+                        <b>minimax = <a class="minimax_url" href="{{board.minimax_url}}" target="_blank">{{board.minimax_contract}}</a> {{board.minimax_outcome}}</b>
                     </td>
                 </tr>
                 </tbody>
@@ -275,7 +275,7 @@ text-align: center
                     {% else %}{{table.contract}}{% endif %}
                 </td>
                 <td align="center">{{table.declarer}}</td>
-                <td align="center">{{table.lead|safe| replace("T", "10")}}</td>
+                <td align="center">{{table.lead|safe}}</td>
                 <td align="center">{{table.nsplus}}</td>
                 <td align="center">{{table.nsminus}}</td>
                 <td align="center">{{table.mp_ew}}</td>
