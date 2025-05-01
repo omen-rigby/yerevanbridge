@@ -145,17 +145,12 @@ def top_players():
 
 @app.route('/championship')
 def championship():
-    try:
-        conn = connect()
-        cursor = conn.cursor()
-        cursor.execute(f"""select value from strings where "key"='championship'""")
-        home_page_html = cursor.fetchone()[0]
-        page = render_template('championship.html', page_html=home_page_html)
-    except:
-        page = render_template('championship.html')
-    finally:
-        conn.close()
-    return page
+    return static_page('championship', get_locale())
+
+
+@app.route('/championship/pairs')
+def championship_pairs():
+    return static_page('championship_pairs', get_locale())
 
 
 @app.route('/contest')
