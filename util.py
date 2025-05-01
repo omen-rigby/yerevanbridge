@@ -20,7 +20,7 @@ def static_page(key, locale):
     try:
         conn = connect()
         cursor = conn.cursor()
-        cursor.execute(f"""select value from strings where "key"='{key}_{locale}'""")
+        cursor.execute(f"""select value from strings where "key"='{key}_{locale}' or "key"='{key}' order by key desc""")
         content = cursor.fetchone()[0]
         return render_template(f'{key}.html', content=content)
     except Exception:
