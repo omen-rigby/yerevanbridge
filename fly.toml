@@ -1,14 +1,13 @@
 # fly.toml file generated for yerevanbridge on 2023-01-11T21:38:55+04:00
 
 app = "yerevanbridge"
+primary_region = 'ams'
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
 [build]
   builder = "paketobuildpacks/builder:base"
-  buildpacks = ["gcr.io/paketo-buildpacks/python"]
-
 
 [env]
   PORT = "8080"

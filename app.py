@@ -229,7 +229,7 @@ def rating():
         conn = connect()
         cursor = conn.cursor()
         locale = get_locale()
-        cursor.execute(f'select id,full_name,full_name{("_"+locale) * (locale != "ru")},rating,rank,rank_ru,last_year from players order by rating desc')
+        cursor.execute(f'select id,full_name,full_name{("_"+locale) * (locale != "ru")},rating,rank,rank_ru,last_year from players where is_active is true order by rating desc')
         data = cursor.fetchall()
     finally:
         if conn:
@@ -432,7 +432,7 @@ def board(tournament_id, board_number):
     vul = {'-': "−", "n": "NS", "e": "EW", "b": "ALL"}
 
     repl_dict = {"d": hands[(board_number - 1) % 4].upper(), "b": board_number,
-                 "v": vul[VULNERABILITY[board_number % 16]],
+                 "v": vul[VULNERABILITY[board_number % 100 % 16]],
                  "minimax_contract": Markup(suits(board_data[38])), "minimax_outcome": board_data[39], "minimax_url": board_data[40],
                  "played_boards": played_boards}
     for i, h in enumerate(hands):
